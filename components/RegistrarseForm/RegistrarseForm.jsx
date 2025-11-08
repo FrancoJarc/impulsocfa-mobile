@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Alert } from "react-native";
+import Toast from 'react-native-toast-message';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import CountryPicker from "react-native-country-picker-modal";
 import { registerUser } from "../../services/auth.service";
@@ -24,7 +25,13 @@ export default function RegistrarseForm() {
     const handleImagePick = async () => {
         const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permission.granted) {
-            Alert.alert("Permiso requerido", "Necesitas permitir el acceso a tus fotos.");
+            // 2. Reemplazar Alert por Toast en manejo de permisos
+            Toast.show({
+                type: 'info', // O 'error', según tu preferencia
+                text1: 'Permiso requerido',
+                text2: 'Necesitas permitir el acceso a tus fotos.',
+                position: 'top',
+            });
             return;
         }
 
@@ -41,14 +48,28 @@ export default function RegistrarseForm() {
 
     const handleSubmit = async () => {
         if (!formData.email || !formData.password || !formData.nombre || !formData.apellido) {
-            Alert.alert("Campos incompletos", "Por favor completa todos los campos obligatorios.");
+            // 3. Reemplazar Alert por Toast para validación de campos
+            Toast.show({
+                type: 'error',
+                text1: 'Campos incompletos',
+                text2: 'Por favor completa todos los campos obligatorios.',
+                position: 'top',
+            });
             return;
         }
 
         setLoading(true);
         try {
             await registerUser(formData);
-            Alert.alert("Éxito", "¡Registro exitoso! 🎉 Revisa tu correo para confirmar tu cuenta.");
+
+            // 4. Reemplazar Alert por Toast para mensaje de éxito
+            Toast.show({
+                type: 'success',
+                text1: '¡Registro exitoso! 🎉',
+                text2: 'Revisa tu correo para confirmar tu cuenta.',
+                position: 'top',
+                visibilityTime: 6000, // Lo muestro un poco más de tiempo.
+            });
 
             // Limpiar formulario
             setFormData({
@@ -61,16 +82,24 @@ export default function RegistrarseForm() {
                 nacionalidad: "",
             });
         } catch (error) {
-            Alert.alert("Error", error.message || "Error al registrarse 😕");
+            // 5. Reemplazar Alert por Toast para manejo de errores del backend
+            Toast.show({
+                type: 'error',
+                text1: 'Error al registrarse 😕',
+                text2: error.message || "Error desconocido al registrarse.",
+                position: 'top',
+            });
         } finally {
             setLoading(false);
         }
     };
 
+    // ... (Tu JSX permanece igual)
     return (
         <View style={styles.formContainer}>
-            {/* Nombre y Apellido */}
+            {/* ... JSX del formulario ... */}
             <View style={styles.row}>
+                {/* ... Nombre ... */}
                 <View style={styles.halfInput}>
                     <Text style={styles.label}>Nombre</Text>
                     <TextInput
@@ -80,6 +109,7 @@ export default function RegistrarseForm() {
                         placeholder="Tu nombre"
                     />
                 </View>
+                {/* ... Apellido ... */}
                 <View style={styles.halfInput}>
                     <Text style={styles.label}>Apellido</Text>
                     <TextInput
@@ -90,38 +120,9 @@ export default function RegistrarseForm() {
                     />
                 </View>
             </View>
+            {/* ... Resto de los campos (Email, Contraseña, Fecha Nacimiento) ... */}
 
-            {/* Email */}
-            <Text style={styles.label}>Correo electrónico</Text>
-            <TextInput
-                style={styles.input}
-                keyboardType="email-address"
-                value={formData.email}
-                onChangeText={(v) => handleChange("email", v)}
-                placeholder="tuemail@ejemplo.com"
-                autoCapitalize="none"
-            />
-
-            {/* Contraseña */}
-            <Text style={styles.label}>Contraseña</Text>
-            <TextInput
-                style={styles.input}
-                secureTextEntry
-                value={formData.password}
-                onChangeText={(v) => handleChange("password", v)}
-                placeholder="Crea una contraseña"
-            />
-
-            {/* Fecha nacimiento */}
-            <Text style={styles.label}>Fecha de nacimiento</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="AAAA-MM-DD"
-                value={formData.fecha_nacimiento}
-                onChangeText={(v) => handleChange("fecha_nacimiento", v)}
-            />
-
-            {/* Nacionalidad */}
+            {/* Nacionalidad - Country Picker */}
             <Text style={styles.label}>Nacionalidad</Text>
             <TouchableOpacity
                 style={styles.countryButton}

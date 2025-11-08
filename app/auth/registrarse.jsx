@@ -36,7 +36,7 @@ export default function Registrarse() {
                 {/* Link a inicio de sesión */}
                 <View style={styles.loginContainer}>
                     <Text style={styles.loginText}>¿Ya tenés cuenta? </Text>
-                    <TouchableOpacity onPress={() => router.push("/iniciarsesion")}>
+                    <TouchableOpacity onPress={() => router.push("/auth/iniciarsesion")}>
                         <Text style={styles.loginLink}>Iniciá sesión</Text>
                     </TouchableOpacity>
                 </View>

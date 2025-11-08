@@ -48,8 +48,7 @@ export default {
     },
 
     extra: {
-      apiUrl: process.env.EXPO_PUBLIC_API_URL,
-      env: process.env.EXPO_PUBLIC_ENV
+      EXPO_PUBLIC_API_URL: "https://impulsocfa-back.onrender.com/api",
     },
   },
 };
