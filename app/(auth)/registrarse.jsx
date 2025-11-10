@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from "react-nati
 import RegistrarseForm from "../../components/RegistrarseForm/RegistrarseForm";
 import GoogleRegistrarseButton from "../../components/GoogleRegistrarseButton/GoogleRegistrarseButton";
 import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar"; 
 
 export default function Registrarse() {
     const router = useRouter();
@@ -36,7 +37,7 @@ export default function Registrarse() {
                 {/* Link a inicio de sesión */}
                 <View style={styles.loginContainer}>
                     <Text style={styles.loginText}>¿Ya tenés cuenta? </Text>
-                    <TouchableOpacity onPress={() => router.push("/auth/iniciarsesion")}>
+                    <TouchableOpacity onPress={() => router.push("/(auth)/iniciarsesion")}>
                         <Text style={styles.loginLink}>Iniciá sesión</Text>
                     </TouchableOpacity>
                 </View>

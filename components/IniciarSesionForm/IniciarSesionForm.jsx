@@ -59,7 +59,7 @@ export default function IniciarSesionForm() {
                 visibilityTime: 3000,
             });
 
-            setTimeout(() => router.replace("/home"), 800);
+            setTimeout(() => router.replace("/(tabs)"), 800);
 
         } catch (error) {
             console.error("Error al iniciar sesión:", error.message);
@@ -81,7 +81,7 @@ export default function IniciarSesionForm() {
             <View style={styles.card}>
                 <Text style={styles.title}>Iniciar Sesión</Text>
 
-                <View style={styles.form} onSubmit={handleSubmit}>
+                <View style={styles.form}>
                     <TextInput
                         required
                         keyboardType="email-address"
@@ -106,7 +106,8 @@ export default function IniciarSesionForm() {
 
                     <View style={styles.forgotPasswordContainer}>
 
-                        <Link href="/auth/recuperar-contrasenia" style={styles.forgotPasswordLink}>
+                        {/* Asumiendo que crearás app/(auth)/recuperar-contrasenia.jsx */}
+                        <Link href="/(auth)/recuperar-contrasenia" style={styles.forgotPasswordLink}>
                             ¿Olvidaste tu contraseña?
                         </Link>
                     </View>
@@ -139,7 +140,7 @@ export default function IniciarSesionForm() {
 
                 <View style={styles.registerContainer}>
                     <Text style={styles.registerText}>¿No tenés cuenta? </Text>
-                    <Link href="/auth/registrarse" style={styles.registerLink}>
+                    <Link href="/(auth)/registrarse" style={styles.registerLink}>
                         Registrate
                     </Link>
                 </View>
@@ -147,13 +148,12 @@ export default function IniciarSesionForm() {
         </ScrollView>
     );
 }
-
 const styles = StyleSheet.create({
     scrollContainer: {
         flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f5f3ff', 
+        backgroundColor: '#f5f3ff',
         padding: 20,
     },
     card: {
@@ -162,28 +162,28 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(255, 255, 255, 0.9)",
         borderRadius: 20,
         padding: 24,
-        shadowColor: "#8b5cf6", 
+        shadowColor: "#8b5cf6",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 10,
         elevation: 5,
         borderWidth: 1,
-        borderColor: '#e0e7ff', 
+        borderColor: '#e0e7ff',
     },
     title: {
         fontSize: 28,
         fontWeight: "bold",
         textAlign: "center",
         marginBottom: 30,
-        color: "#6d28d9", 
+        color: "#6d28d9",
     },
     form: {
         gap: 20,
     },
     input: {
         width: "100%",
-        backgroundColor: "#f5f3ff", 
-        borderColor: "#c4b5fd", 
+        backgroundColor: "#f5f3ff",
+        borderColor: "#c4b5fd",
         borderWidth: 1,
         borderRadius: 10,
         padding: 14,
@@ -195,13 +195,13 @@ const styles = StyleSheet.create({
         marginTop: -10,
     },
     forgotPasswordLink: {
-        color: "#7c3aed", 
+        color: "#7c3aed",
         fontSize: 14,
         textDecorationLine: 'underline',
     },
     button: {
         marginTop: 10,
-        backgroundColor: "#a78bfa", 
+        backgroundColor: "#a78bfa",
         padding: 14,
         borderRadius: 10,
         alignItems: "center",
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     },
     separatorText: {
         marginHorizontal: 15,
-        color: "#6b7280", 
+        color: "#6b7280",
         fontSize: 14,
     },
     googleButtonWrapper: {
