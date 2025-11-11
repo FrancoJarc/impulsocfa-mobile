@@ -13,7 +13,7 @@ export default function IniciarSesionScreen() {
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
             >
-                <View style={styles.background} />
+                <View style={styles.cardWrapper} />
                 <IniciarSesionForm />
 
             </ScrollView>
@@ -30,8 +30,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f3ff', 
         padding: 20,
     },
-    background: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "#f0f4ff",
+    cardWrapper: {
+        width: "100%",
+        maxWidth: 400,
     },
 });

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import Toast from 'react-native-toast-message';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { useState } from "react";
+import { ActivityIndicator, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import CountryPicker from "react-native-country-picker-modal";
+import Toast from 'react-native-toast-message';
 import { registerUser } from "../../services/auth.service";
 
 export default function RegistrarseForm() {
@@ -137,8 +137,9 @@ export default function RegistrarseForm() {
                 visible={showCountryPicker}
                 withFilter
                 withFlag
-                withCountryNameButton
                 withAlphaFilter
+                withCountryNameButton={false}
+                renderFlagButton={() => null} 
                 onSelect={(country) => {
                     handleChange("nacionalidad", country.name);
                     setShowCountryPicker(false);

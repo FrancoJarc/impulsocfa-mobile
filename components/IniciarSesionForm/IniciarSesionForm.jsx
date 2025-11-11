@@ -153,12 +153,10 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f5f3ff',
-        padding: 20,
+        padding: 0,
     },
     card: {
         width: "100%",
-        maxWidth: 400,
         backgroundColor: "rgba(255, 255, 255, 0.9)",
         borderRadius: 20,
         padding: 24,
@@ -191,13 +189,15 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     forgotPasswordContainer: {
-        alignItems: 'flex-end',
-        marginTop: -10,
+        width: "100%",       
+        alignItems: "center", 
+        marginTop: 10, 
     },
     forgotPasswordLink: {
         color: "#7c3aed",
         fontSize: 14,
         textDecorationLine: 'underline',
+        alignSelf: "center",
     },
     button: {
         marginTop: 10,
