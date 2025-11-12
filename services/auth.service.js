@@ -7,7 +7,14 @@ export async function registerUser(userData) {
     const formData = new FormData();
 
     for (const key in userData) {
-        if (userData[key] !== null && userData[key] !== "") {
+        // Si es la imagen, la manejamos distinto
+        if (key === "foto_perfil" && userData.foto_perfil) {
+            formData.append("foto_perfil", {
+                uri: userData.foto_perfil,
+                name: "perfil.jpg",
+                type: "image/jpeg",
+            });
+        } else if (userData[key] !== null && userData[key] !== "") {
             formData.append(key, userData[key]);
         }
     }
@@ -22,6 +29,33 @@ export async function registerUser(userData) {
 
     return data;
 }
+
+
+export async function googleCallbackMobile(access_token, refresh_token) {
+    try {
+        const res = await fetch(`${API_URL}/google`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ access_token, refresh_token }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Error en login con Google");
+
+        await AsyncStorage.setItem("access_token", data.access_token);
+        await AsyncStorage.setItem("refresh_token", data.refresh_token);
+        await AsyncStorage.setItem("user_role", data.profile.rol);
+        await AsyncStorage.setItem("user", JSON.stringify(data.profile));
+
+        return data;
+    } catch (err) {
+        console.error("Error en googleCallbackMobile:", err);
+        throw err;
+    }
+}
+
+
+
 
 // 🔐 Login normal
 export async function login(email, password) {

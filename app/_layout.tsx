@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import Toast from "react-native-toast-message";
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -14,7 +15,6 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack
-        // 🚨 CLAVE: Aplica la opción de ocultar el header a *todas* las pantallas del stack por defecto
         screenOptions={{ headerShown: false }}
       >
         {/* 1. index.js: Punto de inicio. Debe ser el primero. */}
@@ -29,8 +29,9 @@ export default function RootLayout() {
         {/* 4. Pantallas Modales (u otras rutas que necesiten ser Stack Screens) */}
         <Stack.Screen name="modal" options={{ headerShown: true, presentation: 'modal', title: 'Modal' }} />
 
-
       </Stack>
+      <Toast />
+
       <StatusBar style="auto" />
     </ThemeProvider>
   );

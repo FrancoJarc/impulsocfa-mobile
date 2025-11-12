@@ -2,6 +2,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { ActivityIndicator, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import CountryPicker from "react-native-country-picker-modal";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import Toast from 'react-native-toast-message';
 import { registerUser } from "../../services/auth.service";
 
@@ -17,6 +18,8 @@ export default function RegistrarseForm() {
     });
     const [loading, setLoading] = useState(false);
     const [showCountryPicker, setShowCountryPicker] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+
 
     const handleChange = (key, value) => {
         setFormData((prev) => ({ ...prev, [key]: value }));
@@ -25,9 +28,8 @@ export default function RegistrarseForm() {
     const handleImagePick = async () => {
         const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permission.granted) {
-            // 2. Reemplazar Alert por Toast en manejo de permisos
             Toast.show({
-                type: 'info', // O 'error', según tu preferencia
+                type: 'info', 
                 text1: 'Permiso requerido',
                 text2: 'Necesitas permitir el acceso a tus fotos.',
                 position: 'top',
@@ -48,7 +50,6 @@ export default function RegistrarseForm() {
 
     const handleSubmit = async () => {
         if (!formData.email || !formData.password || !formData.nombre || !formData.apellido) {
-            // 3. Reemplazar Alert por Toast para validación de campos
             Toast.show({
                 type: 'error',
                 text1: 'Campos incompletos',
@@ -62,7 +63,6 @@ export default function RegistrarseForm() {
         try {
             await registerUser(formData);
 
-            // 4. Reemplazar Alert por Toast para mensaje de éxito
             Toast.show({
                 type: 'success',
                 text1: '¡Registro exitoso! 🎉',
@@ -82,7 +82,7 @@ export default function RegistrarseForm() {
                 nacionalidad: "",
             });
         } catch (error) {
-            // 5. Reemplazar Alert por Toast para manejo de errores del backend
+            console.log("No se pudo registrar", error);
             Toast.show({
                 type: 'error',
                 text1: 'Error al registrarse 😕',
@@ -94,7 +94,7 @@ export default function RegistrarseForm() {
         }
     };
 
-    // ... (Tu JSX permanece igual)
+  
     return (
         <View style={styles.formContainer}>
             {/* ... JSX del formulario ... */}
@@ -120,7 +120,60 @@ export default function RegistrarseForm() {
                     />
                 </View>
             </View>
-            {/* ... Resto de los campos (Email, Contraseña, Fecha Nacimiento) ... */}
+            
+            <Text style={styles.label}>Correo electrónico</Text>
+            <TextInput
+                style={styles.input}
+                value={formData.email}
+                onChangeText={(v) => handleChange("email", v)}
+                placeholder="Ingresa tu correo"
+                keyboardType="email-address"
+                autoCapitalize="none"
+            />
+
+            {/* Contraseña */}
+            <Text style={styles.label}>Contraseña</Text>
+            <TextInput
+                style={styles.input}
+                value={formData.password}
+                onChangeText={(v) => handleChange("password", v)}
+                placeholder="Crea una contraseña"
+                secureTextEntry
+            />
+
+            {/* Fecha de nacimiento */}
+            <Text style={styles.label}>Fecha de nacimiento</Text>
+            <TouchableOpacity
+                style={styles.input}
+                onPress={() => setShowDatePicker(true)}
+            >
+                <Text>
+                    {formData.fecha_nacimiento
+                        ? formData.fecha_nacimiento
+                        : "Selecciona tu fecha de nacimiento"}
+                </Text>
+            </TouchableOpacity>
+
+            {showDatePicker && (
+                <DateTimePicker
+                    value={
+                        formData.fecha_nacimiento
+                            ? new Date(formData.fecha_nacimiento)
+                            : new Date()
+                    }
+                    mode="date"
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                        setShowDatePicker(false);
+                        if (selectedDate) {
+                            const isoDate = selectedDate.toISOString().split("T")[0];
+                            handleChange("fecha_nacimiento", isoDate);
+                        }
+                    }}
+                    maximumDate={new Date()} 
+                />
+            )}
+
 
             {/* Nacionalidad - Country Picker */}
             <Text style={styles.label}>Nacionalidad</Text>
@@ -195,8 +248,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         gap: 10,
     },
+    row: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
     halfInput: {
         flex: 1,
+        marginRight: 5, // para espaciar
     },
     countryButton: {
         backgroundColor: "#ede9fe",

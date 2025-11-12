@@ -62,7 +62,7 @@ export default function IniciarSesionForm() {
             setTimeout(() => router.replace("/(tabs)"), 800);
 
         } catch (error) {
-            console.error("Error al iniciar sesión:", error.message);
+            console.log("Error al iniciar sesión:", error.message);
 
             Toast.hide(toastId);
             Toast.show({

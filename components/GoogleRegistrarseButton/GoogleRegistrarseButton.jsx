@@ -3,6 +3,8 @@ import Toast from 'react-native-toast-message';
 import { TouchableOpacity, Text, StyleSheet, View, ActivityIndicator } from "react-native";
 import { supabase } from "../../supabaseClient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as AuthSession from "expo-auth-session";
+import Constants from "expo-constants";
 
 export default function GoogleRegistrarseButton() {
     const [loading, setLoading] = useState(false);
@@ -10,31 +12,31 @@ export default function GoogleRegistrarseButton() {
     const loginWithGoogle = async () => {
         setLoading(true);
 
-        // 2. Mostrar toast de carga (Reemplaza toast.loading de react-hot-toast)
         Toast.show({
             type: 'info',
             text1: 'Redirigiendo...',
             text2: 'Abriendo Google para iniciar sesión.',
             position: 'top',
-            // Usamos un ID único para poder ocultarlo después si es necesario
-            // Aunque en móvil, la app se suspende al abrir el navegador.
         });
 
         try {
+            const redirectTo = AuthSession.makeRedirectUri({ useProxy: true })
+            console.log(AuthSession.makeRedirectUri({ useProxy: true }));
+            /*const redirectTo =
+                Constants.appOwnership === "expo"
+                    ? AuthSession.makeRedirectUri({ useProxy: true }) // Expo Go
+                    : "impulsocfamobile://google-callback"; // APK
+*/
+            console.log("Redirect URL:", redirectTo);
+
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: "google",
-                options: {
-                    // 3. CAMBIO CLAVE: Usar el esquema de redirección móvil
-                    // Debe coincidir con lo que registraste en Supabase
-                    redirectTo: "impulsocfamobile://google-callback",
-                },
+                options: { redirectTo },
             });
 
             if (error) {
-                // 4. Reemplazar console.error y toast.error por Toast.show()
-                console.error("Error en login con Google:", error.message);
+                console.log("Error en login con Google:", error.message);
 
-                // Mostrar error si la llamada falla antes de salir de la app
                 Toast.show({
                     type: 'error',
                     text1: 'Error de autenticación',
@@ -42,9 +44,6 @@ export default function GoogleRegistrarseButton() {
                     position: 'top',
                 });
             }
-
-            // Si tiene éxito, la app se suspende y el usuario se redirige al navegador.
-            // La notificación de éxito se mostrará al regresar (en tu componente de manejo de callback).
 
         } catch (err) {
             Toast.show({
@@ -55,7 +54,6 @@ export default function GoogleRegistrarseButton() {
             });
         } finally {
             setLoading(false);
-            // Normalmente no se oculta el toast aquí, ya que la navegación a Google ocurre
         }
     };
 
