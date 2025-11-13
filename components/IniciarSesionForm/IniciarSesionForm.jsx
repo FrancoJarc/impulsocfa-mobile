@@ -50,15 +50,7 @@ export default function IniciarSesionForm() {
 
         try {
             const data = await login(formData.email, formData.password);
-            console.log("Usuario logueado:", data);
-
             Toast.hide(toastId);
-            Toast.show({
-                type: 'success',
-                text1: "¡Inicio de sesión exitoso! 🚀",
-                visibilityTime: 3000,
-            });
-
             setTimeout(() => router.replace("/(tabs)"), 800);
 
         } catch (error) {
@@ -105,9 +97,7 @@ export default function IniciarSesionForm() {
                     />
 
                     <View style={styles.forgotPasswordContainer}>
-
-                        {/* Asumiendo que crearás app/(auth)/recuperar-contrasenia.jsx */}
-                        <Link href="/(auth)/recuperar-contrasenia" style={styles.forgotPasswordLink}>
+                        <Link href="/(auth)/recuperarcontrasenia" style={styles.forgotPasswordLink}>
                             ¿Olvidaste tu contraseña?
                         </Link>
                     </View>

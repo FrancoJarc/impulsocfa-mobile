@@ -20,13 +20,7 @@ export default function GoogleRegistrarseButton() {
         });
 
         try {
-            const redirectTo = AuthSession.makeRedirectUri({ useProxy: true })
-            console.log(AuthSession.makeRedirectUri({ useProxy: true }));
-            /*const redirectTo =
-                Constants.appOwnership === "expo"
-                    ? AuthSession.makeRedirectUri({ useProxy: true }) // Expo Go
-                    : "impulsocfamobile://google-callback"; // APK
-*/
+            const redirectTo = AuthSession.makeRedirectUri({ useProxy: false })
             console.log("Redirect URL:", redirectTo);
 
             const { error } = await supabase.auth.signInWithOAuth({

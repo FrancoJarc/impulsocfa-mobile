@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Redirect, SplashScreen } from "expo-router";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
-// Importar la función que verifica el token
 import { checkSession } from "../services/auth.service";
 
 // Evita que el splash screen se oculte antes de cargar el estado de la sesión
