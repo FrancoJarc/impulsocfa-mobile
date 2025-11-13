@@ -31,6 +31,7 @@ export default function TabsLayout() {
         name="donar"
         options={{
           title: "Donar",
+          href: "/(campanas)/Campanas",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="heart-outline" color={color} size={size} />
           ),
