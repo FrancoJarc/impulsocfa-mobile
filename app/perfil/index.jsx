@@ -44,7 +44,7 @@ export default function PerfilHome() {
         <TouchableOpacity
           onPress={async () => {
             await AsyncStorage.removeItem("access_token");
-            router.replace("/login");
+            router.replace("/(auth)/iniciarsesion");
           }}
           style={[styles.button, styles.logoutButton]}
         >

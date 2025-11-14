@@ -15,7 +15,7 @@ import {
     getUserCampaigns,
     getUserPendingCampaigns,
     getUserRejectedCampaigns,
-} from "../../../services/campaign.service";
+} from "../../services/campaign.service";
 
 export default function CampanasPage() {
     const [user, setUser] = useState(null);

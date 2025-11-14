@@ -13,11 +13,10 @@ import {
     View
 } from "react-native";
 import Toast from "react-native-toast-message";
-import Comments from "../../components/comentarios/Comments";
+import Comments from "../../components/Comentarios/Comments"; 
 import { getCampaignById } from "../../services/campaign.service";
 import { createPreference } from "../../services/payment.service"; // debe devolver { init_point, preference_id }
-import UltimasDonaciones from "./UltimasDonaciones";
-
+import UltimasDonaciones from "../../components/Campanas/UltimasDonaciones";
 
 export default function DetalleCampana() {
     const router = useRouter();
@@ -362,21 +361,8 @@ export default function DetalleCampana() {
 
                     {/* Comentarios y últimas donaciones (componentes) */}
                     <View style={{ marginTop: 30 }}>
-                        {Comments ? (
-                            <Comments id_campana={id} />
-                        ) : (
-                            <Text style={{ color: "#6b7280" }}>
-                                Comentarios (componente no encontrado)
-                            </Text>
-                        )}
-
-                        {UltimasDonaciones ? (
-                            <UltimasDonaciones id_campana={id} token={null} />
-                        ) : (
-                            <Text style={{ color: "#6b7280", marginTop: 8 }}>
-                                Últimas donaciones (componente no encontrado)
-                            </Text>
-                        )}
+                        <Comments id_campana={id} />
+                        <UltimasDonaciones id_campana={id} />
                     </View>
                 </View>
             </View>
