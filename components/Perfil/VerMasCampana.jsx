@@ -12,9 +12,10 @@ import {
 import { useLocalSearchParams, router } from "expo-router";
 import { getCampaignById, suspendCampaign } from "../../services/campaign.service";
 import Toast from "react-native-toast-message";
+import Comments from "../../components/Comentarios/Comments";
 
 export default function VerMasCampana() {
-  const { id } = useLocalSearchParams(); 
+  const { id } = useLocalSearchParams();
   const campaignId = id;
 
   const [campana, setCampana] = useState(null);
@@ -227,9 +228,8 @@ export default function VerMasCampana() {
             <Text style={styles.actionText}>Suspender</Text>
           </TouchableOpacity>
         </View>
+        <Comments id_campana={campaignId} />
 
-        {/* Aquí puedes integrar Comments y UltimasDonaciones mobile (si los adaptás) */}
-        {/* <Comments id_campana={campaignId} /> */}
         {/* <UltimasDonaciones id_campana={campaignId} token={...} /> */}
       </View>
     </ScrollView>

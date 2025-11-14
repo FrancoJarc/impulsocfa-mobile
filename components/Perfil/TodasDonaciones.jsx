@@ -25,6 +25,8 @@ import {
 } from "../../services/campaign.service";
 
 import { getUserTotal } from "../../services/user.service";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 export default function TodasDonaciones() {
   const [donaciones, setDonaciones] = useState([]);
@@ -99,125 +101,127 @@ export default function TodasDonaciones() {
     );
 
   return (
-    <LinearGradient
-      colors={["#e0f2ff", "#f5e1ff", "#ffdfed"]}
-      style={{ flex: 1 }}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* HEADER */}
-        <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <Sparkles size={32} color="#a855f7" style={{ marginRight: 4 }} />
-            <Text style={styles.title}>Donaciones Recibidas</Text>
-            <Sparkles size={32} color="#ec4899" />
-          </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <LinearGradient
+        colors={["#e0f2ff", "#f5e1ff", "#ffdfed"]}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* HEADER */}
+          <View style={styles.header}>
+            <View style={styles.headerRow}>
+              <Sparkles size={32} color="#a855f7" style={{ marginRight: 4 }} />
+              <Text style={styles.title}>Donaciones Recibidas</Text>
+              <Sparkles size={32} color="#ec4899" />
+            </View>
 
-          <Text style={styles.subtitle}>
-            Total de{" "}
-            <Text style={styles.subtitleBold}>{donaciones.length}</Text>{" "}
-            donaciones
-          </Text>
-
-          <View style={styles.moneyRow}>
-            <Wallet size={24} color="#7c3aed" />
-            <Text style={styles.moneyText}>
-              Monto total recaudado:{" "}
-              <Text style={styles.moneyValue}>
-                $
-                {Number(totalRecaudado).toLocaleString("es-AR", {
-                  minimumFractionDigits: 2,
-                })}
-              </Text>
+            <Text style={styles.subtitle}>
+              Total de{" "}
+              <Text style={styles.subtitleBold}>{donaciones.length}</Text>{" "}
+              donaciones
             </Text>
+
+            <View style={styles.moneyRow}>
+              <Wallet size={24} color="#7c3aed" />
+              <Text style={styles.moneyText}>
+                Monto total recaudado:{" "}
+                <Text style={styles.moneyValue}>
+                  $
+                  {Number(totalRecaudado).toLocaleString("es-AR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </Text>
+              </Text>
+            </View>
           </View>
-        </View>
 
-        {/* DONACIÓN CARD */}
-        {donaciones.map((don, index) => {
-          const gradients = [
-            ["#3b82f6", "#8b5cf6"],
-            ["#a855f7", "#ec4899"],
-            ["#ec4899", "#f97316"],
-            ["#f97316", "#ef4444"],
-            ["#22c55e", "#10b981"],
-          ];
+          {/* DONACIÓN CARD */}
+          {donaciones.map((don, index) => {
+            const gradients = [
+              ["#3b82f6", "#8b5cf6"],
+              ["#a855f7", "#ec4899"],
+              ["#ec4899", "#f97316"],
+              ["#f97316", "#ef4444"],
+              ["#22c55e", "#10b981"],
+            ];
 
-          const gradient = gradients[index % gradients.length];
+            const gradient = gradients[index % gradients.length];
 
-          return (
-            <Pressable key={don.id_donacion} style={({ pressed }) => [
-              styles.cardContainer,
-              pressed && { transform: [{ scale: 0.97 }] },
-            ]}>
-              <LinearGradient colors={["#ffffff", "#faf8ff"]} style={styles.card}>
-                {/* FOTO + INFO */}
-                <View style={styles.row}>
-                  <View style={styles.avatarWrapper}>
-                    <LinearGradient
-                      colors={gradient}
-                      style={styles.avatarGlow}
-                    />
-                    <Image
-                      source={{
-                        uri:
-                          don.usuario?.foto_perfil ||
-                          "https://via.placeholder.com/100",
-                      }}
-                      style={styles.avatar}
-                    />
-                    <Heart
-                      size={20}
-                      color={gradient[0]}
-                      style={styles.heartBadge}
-                    />
-                  </View>
-
-                  <View style={styles.info}>
-                    <Text style={styles.name} numberOfLines={1}>
-                      {don.usuario?.nombre} {don.usuario?.apellido}
-                    </Text>
-
-                    <View style={styles.badgeRow}>
-                      <LinearGradient colors={gradient} style={styles.moneyBadge}>
-                        <DollarSign size={16} color="white" />
-                        <Text style={styles.moneyBadgeText}>${don.monto}</Text>
-                      </LinearGradient>
+            return (
+              <Pressable key={don.id_donacion} style={({ pressed }) => [
+                styles.cardContainer,
+                pressed && { transform: [{ scale: 0.97 }] },
+              ]}>
+                <LinearGradient colors={["#ffffff", "#faf8ff"]} style={styles.card}>
+                  {/* FOTO + INFO */}
+                  <View style={styles.row}>
+                    <View style={styles.avatarWrapper}>
+                      <LinearGradient
+                        colors={gradient}
+                        style={styles.avatarGlow}
+                      />
+                      <Image
+                        source={{
+                          uri:
+                            don.usuario?.foto_perfil ||
+                            "https://via.placeholder.com/100",
+                        }}
+                        style={styles.avatar}
+                      />
+                      <Heart
+                        size={20}
+                        color={gradient[0]}
+                        style={styles.heartBadge}
+                      />
                     </View>
 
-                    <View style={styles.dateRow}>
-                      <Calendar size={16} color="#8b5cf6" />
-                      <Text style={styles.dateText}>
-                        {new Date(don.fecha).toLocaleDateString("es-ES", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
+                    <View style={styles.info}>
+                      <Text style={styles.name} numberOfLines={1}>
+                        {don.usuario?.nombre} {don.usuario?.apellido}
+                      </Text>
+
+                      <View style={styles.badgeRow}>
+                        <LinearGradient colors={gradient} style={styles.moneyBadge}>
+                          <DollarSign size={16} color="white" />
+                          <Text style={styles.moneyBadgeText}>${don.monto}</Text>
+                        </LinearGradient>
+                      </View>
+
+                      <View style={styles.dateRow}>
+                        <Calendar size={16} color="#8b5cf6" />
+                        <Text style={styles.dateText}>
+                          {new Date(don.fecha).toLocaleDateString("es-ES", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </Text>
+                      </View>
+
+                      <Text style={styles.campaign} numberOfLines={1}>
+                        {don.titulo_campana}
                       </Text>
                     </View>
 
-                    <Text style={styles.campaign} numberOfLines={1}>
-                      {don.titulo_campana}
-                    </Text>
+                    {/* RANK */}
+                    <LinearGradient colors={gradient} style={styles.rankCircle}>
+                      <Text style={styles.rankText}>#{index + 1}</Text>
+                    </LinearGradient>
                   </View>
+                </LinearGradient>
+              </Pressable>
+            );
+          })}
 
-                  {/* RANK */}
-                  <LinearGradient colors={gradient} style={styles.rankCircle}>
-                    <Text style={styles.rankText}>#{index + 1}</Text>
-                  </LinearGradient>
-                </View>
-              </LinearGradient>
-            </Pressable>
-          );
-        })}
-
-        <View style={styles.footer}>
-          <Text style={styles.footerTitle}>¡Falta poco para tu objetivo!</Text>
-          <Text style={styles.footerSub}>
-            Cada donación representa un acto de apoyo 💜
-          </Text>
-        </View>
-      </ScrollView>
-    </LinearGradient>
+          <View style={styles.footer}>
+            <Text style={styles.footerTitle}>¡Falta poco para tu objetivo!</Text>
+            <Text style={styles.footerSub}>
+              Cada donación representa un acto de apoyo 💜
+            </Text>
+          </View>
+        </ScrollView>
+      </LinearGradient>
+    </SafeAreaView>
   );
 }
 
