@@ -9,8 +9,6 @@ export default function HomeScreen() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Simular verificación de token almacenado
-    // En producción, leer desde AsyncStorage o Supabase.auth.getSession()
     setIsLoggedIn(false);
   }, []);
 
@@ -134,12 +132,29 @@ export default function HomeScreen() {
   );
 }
 
+
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F8F5FF" },
-  hero: { alignItems: "center", justifyContent: "center", paddingVertical: 60, paddingHorizontal: 20 },
+
+  /* HERO */
+  hero: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 60,
+    paddingBottom: 40,
+    paddingHorizontal: 20,
+  },
   title: { fontSize: 42, fontWeight: "bold", color: "#6D28D9" },
   highlight: { color: "#3B82F6" },
-  subtitle: { textAlign: "center", fontSize: 18, color: "#555", marginVertical: 20 },
+  subtitle: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "#555",
+    marginTop: 16,
+    marginBottom: 26,
+  },
+
   donateButton: {
     backgroundColor: "#8B5CF6",
     flexDirection: "row",
@@ -154,7 +169,15 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   donateText: { color: "#fff", fontSize: 18, fontWeight: "600" },
-  statsContainer: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginVertical: 20 },
+
+  /* STATS */
+  statsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    paddingTop: 5,
+    paddingBottom:20,
+  },
   statBox: {
     backgroundColor: "white",
     borderRadius: 12,
@@ -168,9 +191,27 @@ const styles = StyleSheet.create({
   },
   statValue: { fontSize: 22, fontWeight: "700", color: "#6D28D9" },
   statLabel: { fontSize: 13, color: "#666", marginTop: 4 },
-  section: { padding: 20 },
-  sectionTitle: { fontSize: 26, fontWeight: "700", textAlign: "center", color: "#6D28D9", marginBottom: 20 },
-  featuresContainer: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 16 },
+
+  /* SECTIONS (global) */
+  section: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  sectionTitle: {
+    fontSize: 26,
+    fontWeight: "700",
+    textAlign: "center",
+    color: "#6D28D9",
+    marginBottom: 16,
+  },
+
+  /* FEATURES */
+  featuresContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 16,
+  },
   featureBox: {
     backgroundColor: "white",
     width: "90%",
@@ -182,12 +223,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     elevation: 2,
   },
-  featureTitle: { fontSize: 18, fontWeight: "600", marginTop: 8, color: "#333" },
-  featureDesc: { textAlign: "center", fontSize: 14, color: "#555", marginTop: 4 },
+  featureTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginTop: 8,
+    color: "#333",
+  },
+  featureDesc: {
+    textAlign: "center",
+    fontSize: 14,
+    color: "#555",
+    marginTop: 6,
+  },
+
+  /* CAMPAIGNS */
   campaignCard: {
     backgroundColor: "white",
     borderRadius: 16,
-    marginVertical: 10,
+    marginVertical: 12,
     overflow: "hidden",
     shadowColor: "#7C3AED",
     shadowOpacity: 0.1,
@@ -197,10 +250,44 @@ const styles = StyleSheet.create({
   campaignContent: { padding: 16 },
   impactRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   impactText: { color: "#6D28D9", fontSize: 13 },
-  campaignTitle: { fontSize: 18, fontWeight: "700", color: "#111", marginTop: 8 },
-  campaignDesc: { fontSize: 14, color: "#555", marginTop: 4 },
-  raisedText: { fontSize: 14, color: "#6D28D9", fontWeight: "600", marginTop: 8 },
-  ctaSection: { alignItems: "center", padding: 30, backgroundColor: "white", margin: 20, borderRadius: 20 },
-  ctaTitle: { fontSize: 22, fontWeight: "700", color: "#222", textAlign: "center", marginBottom: 10 },
-  ctaSubtitle: { fontSize: 16, color: "#666", textAlign: "center", marginBottom: 20 },
+  campaignTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111",
+    marginTop: 8,
+  },
+  campaignDesc: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 6,
+  },
+  raisedText: {
+    fontSize: 14,
+    color: "#6D28D9",
+    fontWeight: "600",
+    marginTop: 10,
+  },
+
+  /* CTA */
+  ctaSection: {
+    alignItems: "center",
+    padding: 24,
+    backgroundColor: "white",
+    marginHorizontal: 20,
+    marginVertical: 24,
+    borderRadius: 20,
+  },
+  ctaTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#222",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  ctaSubtitle: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: 20,
+  },
 });

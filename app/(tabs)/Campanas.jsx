@@ -175,7 +175,7 @@ export default function Campanas() {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "#f3e8ff",
+        backgroundColor: "#F8F5FF",
         flex: 1,
         paddingHorizontal: 16,
         paddingTop: 15,

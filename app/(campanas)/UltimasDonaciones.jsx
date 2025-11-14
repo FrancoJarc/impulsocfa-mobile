@@ -36,11 +36,9 @@ export default function UltimasDonaciones({ id_campana }) {
             {donaciones.length === 0 ? (
                 <Text style={styles.emptyText}>Aún no hay donaciones</Text>
             ) : (
-                <FlatList
-                    data={donaciones}
-                    keyExtractor={(item) => item.id_donacion.toString()}
-                    renderItem={({ item }) => (
-                        <View style={styles.item}>
+                <View>
+                    {donaciones.map((item) => (
+                        <View key={item.id_donacion.toString()} style={styles.item}>
                             <View style={styles.userRow}>
                                 <Image
                                     source={{
@@ -62,8 +60,8 @@ export default function UltimasDonaciones({ id_campana }) {
                                 })}
                             </Text>
                         </View>
-                    )}
-                />
+                    ))}
+                </View>
             )}
         </View>
     );

@@ -1,31 +1,28 @@
-import React, { useEffect, useState, useRef } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
+import { useEffect, useRef, useState } from "react";
 import {
-    View,
-    Text,
+    ActivityIndicator,
     Image,
     ScrollView,
     StyleSheet,
-    ActivityIndicator,
-    TouchableOpacity,
+    Text,
     TextInput,
-    Alert,
-    Modal,
-    Pressable,
+    TouchableOpacity,
+    View
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { getCampaignById } from "../../services/campaign.service"; 
-import { createPreference } from "../../services/payment.service"; // debe devolver { init_point, preference_id }
 import Toast from "react-native-toast-message";
-import * as WebBrowser from "expo-web-browser";
-import { Ionicons } from "@expo/vector-icons";
 import Comments from "../../components/comentarios/Comments";
-import UltimasDonaciones from "./UltimasDonaciones"; 
+import { getCampaignById } from "../../services/campaign.service";
+import { createPreference } from "../../services/payment.service"; // debe devolver { init_point, preference_id }
+import UltimasDonaciones from "./UltimasDonaciones";
 
 
 export default function DetalleCampana() {
     const router = useRouter();
-    const params = useLocalSearchParams(); // expo-router: recibe params de la ruta
-    const id = params.id || params?.[0]; // dependiendo de la ruta que uses
+    const params = useLocalSearchParams(); 
+    const id = params.id || params?.[0];
 
     const [campana, setCampana] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -161,11 +158,12 @@ export default function DetalleCampana() {
         }
     };
 
+
     if (loading) {
         return (
-            <View style={styles.center}>
-                <ActivityIndicator size="large" color="#7c3aed" />
-                <Text style={{ marginTop: 12, color: "#374151" }}>Cargando campaña...</Text>
+            <View style={styles.loader}>
+                <ActivityIndicator size="large" />
+                <Text>Cargando campaña...</Text>
             </View>
         );
     }
@@ -173,15 +171,15 @@ export default function DetalleCampana() {
     if (error) {
         return (
             <View style={styles.center}>
-                <Text style={{ color: "red" }}>Error: {error}</Text>
+                <Text style={{ color: "#f5f3ff" }}>Error: {error}</Text>
             </View>
         );
     }
 
-    if (!campana) {
+    if (!campana && !loading) {
         return (
             <View style={styles.center}>
-                <Text style={{ color: "#374151" }}>No se encontró la campaña.</Text>
+                <Text style={{ color: "#f5f3ff" }}>No se encontró la campaña.</Text>
             </View>
         );
     }
@@ -195,7 +193,7 @@ export default function DetalleCampana() {
             <View style={styles.topBar}>
                 <TouchableOpacity
                     style={styles.backButton}
-                    onPress={() => router.push("/campanas")}
+                    onPress={() => router.push("/(tabs)/Campanas")}
                 >
                     <Ionicons name="chevron-back" size={20} color="#7c3aed" />
                     <Text style={styles.backText}>Volver a campañas</Text>
@@ -248,7 +246,7 @@ export default function DetalleCampana() {
                     <Text style={styles.description}>{campana.descripcion}</Text>
 
                     {/* Progress bar */}
-                    <View style={{ marginTop: 18 }}>
+                    <View style={{ marginTop: 30 }}>
                         <View style={styles.progressHeader}>
                             <Text style={styles.progressLabel}>Progreso de financiamiento</Text>
                             <Text style={styles.progressPercent}>{porcentaje.toFixed(1)}%</Text>
@@ -278,25 +276,24 @@ export default function DetalleCampana() {
                             <Text style={styles.statValue}>${Number(campana.monto_actual).toLocaleString()}</Text>
                         </View>
                         <View style={styles.statBox}>
-                            <Text style={styles.statLabel}>Duración</Text>
-                            <Text style={styles.statValue}>
-                                {new Date(campana.tiempo_objetivo).toLocaleDateString()}
-                            </Text>
-                        </View>
-                        <View style={styles.statBox}>
                             <Text style={styles.statLabel}>Inicio</Text>
                             <Text style={styles.statValue}>
                                 {new Date(campana.fecha_inicio).toLocaleDateString()}
                             </Text>
                         </View>
+                        <View style={styles.statBox}>
+                            <Text style={styles.statLabel}>Duración</Text>
+                            <Text style={styles.statValue}>
+                                {new Date(campana.tiempo_objetivo).toLocaleDateString()}
+                            </Text>
+                        </View>
                     </View>
 
                     {/* Formulario de donación */}
-                    <View style={{ marginTop: 16 }}>
+                    <View style={{ marginTop: 30 }}>
                         <Text style={styles.formLabel}>Monto a donar 💵</Text>
 
                         <View style={styles.amountRow}>
-                            <Text style={styles.currency}>$</Text>
                             <TextInput
                                 value={amount}
                                 onChangeText={handleAmountChange}
@@ -364,17 +361,21 @@ export default function DetalleCampana() {
                     </View>
 
                     {/* Comentarios y últimas donaciones (componentes) */}
-                    <View style={{ marginTop: 18 }}>
-                        {/* Si no tenés estos componentes en RN, reemplazalos por placeholders */}
-                        {typeof Comments !== "undefined" ? (
+                    <View style={{ marginTop: 30 }}>
+                        {Comments ? (
                             <Comments id_campana={id} />
                         ) : (
-                            <Text style={{ color: "#6b7280" }}>Comentarios (componente no encontrado)</Text>
+                            <Text style={{ color: "#6b7280" }}>
+                                Comentarios (componente no encontrado)
+                            </Text>
                         )}
-                        {typeof UltimasDonaciones !== "undefined" ? (
+
+                        {UltimasDonaciones ? (
                             <UltimasDonaciones id_campana={id} token={null} />
                         ) : (
-                            <Text style={{ color: "#6b7280", marginTop: 8 }}>Últimas donaciones (componente no encontrado)</Text>
+                            <Text style={{ color: "#6b7280", marginTop: 8 }}>
+                                Últimas donaciones (componente no encontrado)
+                            </Text>
                         )}
                     </View>
                 </View>
@@ -387,7 +388,9 @@ export default function DetalleCampana() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "#f5f3ff" },
-    topBar: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8 },
+    topBar: {
+        paddingHorizontal: 16, paddingTop: 35, paddingBottom: 8
+    },
     backButton: { flexDirection: "row", alignItems: "center", gap: 8 },
     backText: { color: "#7c3aed", fontWeight: "600" },
 
@@ -450,7 +453,7 @@ const styles = StyleSheet.create({
     metaText: { color: "#374151" },
     metaBold: { color: "#6d28d9", fontWeight: "700" },
 
-    statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 16 },
+    statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 40 },
     statBox: {
         width: "48%",
         backgroundColor: "white",
@@ -469,7 +472,6 @@ const styles = StyleSheet.create({
     formLabel: { color: "#374151", fontWeight: "700", marginBottom: 6 },
 
     amountRow: { flexDirection: "row", alignItems: "center", marginBottom: 8 },
-    currency: { marginLeft: 4, marginRight: 8, color: "#374151", fontSize: 18 },
     amountInput: {
         flex: 1,
         backgroundColor: "#f5f3ff",
@@ -502,11 +504,17 @@ const styles = StyleSheet.create({
     },
 
     payButton: {
-        marginTop: 14,
+        marginTop: 25,
         backgroundColor: "#7c3aed",
         paddingVertical: 14,
         borderRadius: 12,
         alignItems: "center",
     },
     payButtonText: { color: "white", fontWeight: "700" },
+      loader: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f5f3ff", 
+    },
 });
