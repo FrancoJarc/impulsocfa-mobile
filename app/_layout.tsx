@@ -23,6 +23,8 @@ export default function RootLayout() {
         {/* 2. Login y Registro (sin cabecera de la app principal) */}
         <Stack.Screen name="(auth)"/>
 
+        <Stack.Screen name="(campanas)"/>
+
         {/* 3. Las Tabs (el contenido principal de la app) */}
         <Stack.Screen name="(tabs)"/>
 
