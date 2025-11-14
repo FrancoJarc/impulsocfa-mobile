@@ -57,9 +57,12 @@ export default function UserProfileMobile({ navigation }) {
 
         setPreview(
           user.foto_perfil
-            ? `${API_URL}/${user.foto_perfil}`
-            : null
+            ? user.foto_perfil.startsWith("http")
+              ? user.foto_perfil
+              : `${API_URL}/${user.foto_perfil}`
+            : require("../../assets/images/default-avatar.png")
         );
+
       } catch (err) {
         console.log("Error cargando usuario:", err);
       }
