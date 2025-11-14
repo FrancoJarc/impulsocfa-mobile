@@ -13,6 +13,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { getCampaignById, suspendCampaign } from "../../services/campaign.service";
 import Toast from "react-native-toast-message";
 import Comments from "../../components/Comentarios/Comments";
+import UltimasDonaciones from "../Campanas/UltimasDonaciones";
 
 export default function VerMasCampana() {
   const { id } = useLocalSearchParams();
@@ -229,8 +230,8 @@ export default function VerMasCampana() {
           </TouchableOpacity>
         </View>
         <Comments id_campana={campaignId} />
-
-        {/* <UltimasDonaciones id_campana={campaignId} token={...} /> */}
+        <UltimasDonaciones id_campana={campaignId} />  
+        
       </View>
     </ScrollView>
   );
