@@ -28,10 +28,9 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
-        name="donar"
+        name="Campanas"
         options={{
-          title: "Donar",
-          href: "/(campanas)/Campanas",
+          title: "Campañas",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="heart-outline" color={color} size={size} />
           ),

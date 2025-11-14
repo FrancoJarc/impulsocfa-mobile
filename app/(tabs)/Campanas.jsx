@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useRef, useState } from "react";
 import {
-    View,
-    Text,
-    TextInput,
     Pressable,
     ScrollView,
     StyleSheet,
-    ActivityIndicator,
+    Text,
+    TextInput,
+    View
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import CardCampana from "../../components/CardCampana";
 import { getCampaignsByCategory } from "../../services/campaign.service";
-/*import { getCategories } from "../../services/category.service";*/
+import { getCategories } from "../../services/category.service";
 
 export default function Campanas() {
     const [campanas, setCampanas] = useState([]);
@@ -74,14 +73,6 @@ export default function Campanas() {
             ? "Todas las categorías"
             : categories.find((c) => c.id_categoria === selectedCategory)?.nombre ??
             "Todas las categorías";
-
-    if (loading)
-        return (
-            <View style={styles.center}>
-                <ActivityIndicator size="large" />
-                <Text style={styles.loadingText}>Cargando campañas...</Text>
-            </View>
-        );
 
     if (error)
         return (
@@ -165,7 +156,9 @@ export default function Campanas() {
             </View>
 
             {/* Lista de campañas */}
-            {campanas.length === 0 ? (
+            {loading ? (
+                <Text style={styles.noResults}>Cargando campañas...</Text>
+            ) : !loading && campanas.length === 0 ? (
                 <Text style={styles.noResults}>
                     No hay campañas que coincidan con tu búsqueda.
                 </Text>
@@ -185,6 +178,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#f3e8ff",
         flex: 1,
         paddingHorizontal: 16,
+        paddingTop: 15,
     },
 
     center: {
@@ -192,12 +186,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    loadingText: {
-        marginTop: 10,
-        color: "#7c3aed",
-        fontWeight: "bold",
-    },
-
     header: {
         marginTop: 30,
         marginBottom: 20,
@@ -226,7 +214,8 @@ const styles = StyleSheet.create({
     searchIcon: {
         position: "absolute",
         left: 10,
-        top: 12,
+        top: 13,
+        zIndex: 10,
     },
     input: {
         backgroundColor: "white",

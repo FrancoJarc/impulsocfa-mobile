@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
-import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { useRef, useState } from "react";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function CardCampana({ campana }) {
     const router = useRouter();
@@ -35,7 +35,7 @@ export default function CardCampana({ campana }) {
                 styles.card,
                 pressed && { transform: [{ scale: 1.03 }] },
             ]}
-            onPress={() => router.push(`/campanas/${campana.id_campana}`)}
+            onPress={() => router.push(`/(campanas)/DetalleCampana?id=${campana.id_campana}`)}
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
         >

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
-import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -64,7 +64,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={styles.donateButton}
-          onPress={() => router.push(isLoggedIn ? "/donar" : "/iniciarsesion")}
+          onPress={() => router.push("/Campanas")}
         >
           <Feather name="heart" size={22} color="#fff" />
           <Text style={styles.donateText}>Quiero donar ya!</Text>
@@ -125,7 +125,7 @@ export default function HomeScreen() {
         <Text style={styles.ctaSubtitle}>Cada donación cuenta. Sé parte del cambio que se necesita.</Text>
         <TouchableOpacity
           style={styles.donateButton}
-          onPress={() => router.push(isLoggedIn ? "/donar" : "/iniciarsesion")}
+          onPress={() => router.push("/Campanas")}
         >
           <Text style={styles.donateText}>Donar Ahora</Text>
         </TouchableOpacity>

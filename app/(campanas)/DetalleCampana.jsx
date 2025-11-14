@@ -18,12 +18,9 @@ import { createPreference } from "../../services/payment.service"; // debe devol
 import Toast from "react-native-toast-message";
 import * as WebBrowser from "expo-web-browser";
 import { Ionicons } from "@expo/vector-icons";
+import Comments from "../../components/comentarios/Comments";
+import UltimasDonaciones from "./UltimasDonaciones"; 
 
-// Comments y UltimasDonaciones deben existir como componentes RN; si no, puse placeholders.
-/*
-import Comments from "../../components/comentarios/Comments"; // importa si lo tenés en RN
-import UltimasDonaciones from "../../components/Campanas/UltimasDonaciones"; // ajustá path
-*/
 
 export default function DetalleCampana() {
     const router = useRouter();

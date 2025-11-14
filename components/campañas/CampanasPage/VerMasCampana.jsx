@@ -1,4 +1,3 @@
-// components/CampanasPage/VerMasCampana.js
 import React, { useEffect, useState, useRef } from "react";
 import {
     View,
@@ -15,11 +14,9 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
-
 import { getCampaignById, suspendCampaign } from "../../services/campaign.service";
-// IMPORTA/ADAPTA estos componentes a su versión RN
 import Comments from "../comentarios/Comments";
-import UltimasDonaciones from "../Campanas/UltimasDonaciones";
+import UltimasDonaciones from "../../app/campanas/UltimasDonaciones";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
