@@ -41,7 +41,7 @@ export default function CampanasPage() {
                 setPendingCampaigns(pe);
                 setRejectedCampaigns(re);
             } catch (err) {
-                console.error(err);
+                console.log(err);
                 Toast.show({
                     type: "error",
                     text1: "Error al obtener campañas 😕",

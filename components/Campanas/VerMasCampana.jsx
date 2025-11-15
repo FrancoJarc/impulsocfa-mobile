@@ -39,7 +39,7 @@ export default function VerMasCampana() {
                 const data = await getCampaignById(id);
                 setCampana(data);
             } catch (err) {
-                console.error(err);
+                console.log(err);
                 setError(err.message || "Error al cargar la campaña");
                 Toast.show({
                     type: "error",
@@ -105,7 +105,7 @@ export default function VerMasCampana() {
                             // volver al listado
                             router.push("/campanas");
                         } catch (err) {
-                            console.error(err);
+                            console.log(err);
                             Toast.show({
                                 type: "error",
                                 text1: "Error",

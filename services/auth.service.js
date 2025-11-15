@@ -49,7 +49,7 @@ export async function googleCallbackMobile(access_token, refresh_token) {
 
         return data;
     } catch (err) {
-        console.error("Error en googleCallbackMobile:", err);
+        console.log("Error en googleCallbackMobile:", err);
         throw err;
     }
 }
@@ -71,7 +71,6 @@ export async function login(email, password) {
         throw new Error(data.error || "Error al iniciar sesión");
     }
 
-    // Guardar en AsyncStorage (reemplaza localStorage)
     await AsyncStorage.setItem("access_token", data.access_token);
     await AsyncStorage.setItem("user", JSON.stringify(data.user));
     await AsyncStorage.setItem("user_role", data.user.rol);

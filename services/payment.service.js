@@ -15,7 +15,7 @@ export async function createPreference(paymentData) {
     const token = await AsyncStorage.getItem("access_token");
     if (!token) throw new Error("No estás autenticado");
 
-    const res = await fetch(`${API_URL}/create_preference`, {
+    const res = await fetch(`${API_URL}/mobile/create_preference`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -28,9 +28,9 @@ export async function createPreference(paymentData) {
     if (!res.ok)
       throw new Error(data.error || "Error al crear la preferencia de pago");
 
-    return data.id; // El backend devuelve el ID de la preferencia
+    return data; // El backend devuelve el ID de la preferencia
   } catch (error) {
-    console.error("Error en createPreference (mobile):", error);
+    console.log("Error en createPreference (mobile):", error);
     throw new Error(error.message || "Error al conectar con el servidor");
   }
 }

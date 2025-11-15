@@ -12,7 +12,7 @@ import {
 import { useLocalSearchParams, router } from "expo-router";
 import { getCampaignById, suspendCampaign } from "../../services/campaign.service";
 import Toast from "react-native-toast-message";
-import Comments from "../../components/Comentarios/Comments";
+import Comments from "../../components/comentarios/Comments";
 import UltimasDonaciones from "../Campanas/UltimasDonaciones";
 
 export default function VerMasCampana() {
@@ -34,7 +34,7 @@ export default function VerMasCampana() {
         if (!mounted) return;
         setCampana(data);
       } catch (e) {
-        console.error(e);
+        console.log(e);
         setErr(e.message || "Error al cargar la campaña");
       } finally {
         if (mounted) setLoading(false);
@@ -103,7 +103,7 @@ export default function VerMasCampana() {
               Toast.show({ type: "success", text1: "Campaña suspendida" });
               router.replace("/perfil/MisCampanas");
             } catch (e) {
-              console.error(e);
+              console.log(e);
               Toast.show({ type: "error", text1: "Error al suspender campaña", text2: e.message });
             }
           },

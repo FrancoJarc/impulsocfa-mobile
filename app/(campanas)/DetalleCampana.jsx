@@ -13,20 +13,18 @@ import {
     View
 } from "react-native";
 import Toast from "react-native-toast-message";
-import Comments from "../../components/Comentarios/Comments"; 
+import UltimasDonaciones from "../../components/Campanas/UltimasDonaciones";
+import Comments from "../../components/comentarios/Comments";
 import { getCampaignById } from "../../services/campaign.service";
 import { createPreference } from "../../services/payment.service"; // debe devolver { init_point, preference_id }
-import UltimasDonaciones from "../../components/Campanas/UltimasDonaciones";
 
 export default function DetalleCampana() {
     const router = useRouter();
     const params = useLocalSearchParams(); 
     const id = params.id || params?.[0];
-
     const [campana, setCampana] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     const [amount, setAmount] = useState(""); 
     const [llaveMaestra, setLlaveMaestra] = useState("");
     const [preferenceId, setPreferenceId] = useState(null);
@@ -36,13 +34,16 @@ export default function DetalleCampana() {
     const [currentImage, setCurrentImage] = useState(0);
     const intervalRef = useRef(null);
 
+    const scrollRef = useRef(null);
+
+
     useEffect(() => {
         const fetchCampana = async () => {
             try {
                 const data = await getCampaignById(id);
                 setCampana(data);
             } catch (err) {
-                console.error("Error al obtener campaña", err);
+                console.log("Error al obtener campaña", err);
                 setError(err.message || "Error al obtener la campaña");
             } finally {
                 setLoading(false);
@@ -77,9 +78,7 @@ export default function DetalleCampana() {
         setCurrentImage((prev) => (prev + 1) % imagenes.length);
     };
 
-
     const formatAmount = (raw) => {
-
         const onlyNums = raw.replace(/[^\d,]/g, "");
         const [intPart, decPart] = onlyNums.split(",");
         const intClean = (intPart || "").replace(/^0+(?!$)/, "");
@@ -95,17 +94,22 @@ export default function DetalleCampana() {
     };
 
     const handleAmountChange = (text) => {
-        const formatted = formatAmount(text);
-        setAmount(formatted);
+        setAmount(formatAmount(text));
+    };
+
+    const scrollToTop = () => {
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
     };
 
     const handleDonate = async () => {
         const montoNum = parseAmountToNumber(amount);
         if (!montoNum || montoNum <= 0) {
+            scrollToTop();
             Toast.show({ type: "error", text1: "Ingresá un monto válido" });
             return;
         }
         if (!llaveMaestra.trim()) {
+            scrollToTop();
             Toast.show({ type: "error", text1: "Ingresá tu llave maestra" });
             return;
         }
@@ -113,30 +117,25 @@ export default function DetalleCampana() {
         setIsProcessing(true);
 
         try {
-
-            const comisionMP = montoNum * 0.03;
-            const plataforma = montoNum * 0.02;
             const donacion = montoNum * 0.95;
 
-            // Llamada al backend: createPreference debe devolver init_point
+            // Crear preferencia
             const res = await createPreference({
                 amount: donacion,
                 campaignTitle: campana.titulo,
                 campaignId: campana.id_campana,
                 llave_maestra: llaveMaestra,
             });
-
+        
             // Respuesta esperada: { init_point, preference_id }
             if (!res || (!res.init_point && !res.preference_id)) {
                 throw new Error("Respuesta inválida del servidor");
             }
 
-            setPreferenceId(res.preference_id || res.preferenceId || null);
-
-            Toast.show({ type: "success", text1: "Llave verificada, abriendo checkout..." });
+            setPreferenceId(res.preference_id);
 
             // Abrir checkout en navegador in-app
-            const url = res.init_point || res.initPoint || res.initUrl;
+            const url = res.init_point;
             if (!url) {
                 throw new Error("No se recibió init_point para abrir el checkout");
             }
@@ -144,13 +143,16 @@ export default function DetalleCampana() {
             // Abre navegador embebido
             await WebBrowser.openBrowserAsync(url);
 
-            // Opcional: podes esperar una confirmación desde el backend (webhook) y refrescar la campaña
-            // refrescar datos
-            const fresh = await getCampaignById(id);
-            setCampana(fresh);
+            // Al cerrar el navegador, refrescamos campaña y notificamos
+            /*const updatedCampana = await getCampaignById(id);
+            setCampana(updatedCampana);
+            if (updatedCampana.monto_actual >= campana.monto_actual + donacion) {
+                Toast.show({ type: "success", text1: "¡Donación acreditada con éxito! 💜" });
+            }*/
 
         } catch (err) {
-            console.error("Error createPreference:", err);
+            scrollToTop();
+            console.log("Error createPreference:", err);
             Toast.show({ type: "error", text1: err.message || "Error al procesar pago" });
         } finally {
             setIsProcessing(false);
@@ -187,7 +189,7 @@ export default function DetalleCampana() {
     const porcentaje = Math.min((campana.monto_actual / campana.monto_objetivo) * 100, 100);
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
+        <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={{ paddingBottom: 60 }}>
             {/* Volver */}
             <View style={styles.topBar}>
                 <TouchableOpacity
@@ -313,13 +315,13 @@ export default function DetalleCampana() {
                                     return (
                                         <>
                                             <Text style={styles.breakText}>
-                                                💜 <Text style={styles.metaBold}>${donacion.toFixed(2)}</Text> → campaña
+                                                💜 <Text style={styles.metaBold}>${donacion.toFixed(2)}</Text> → Campaña
                                             </Text>
                                             <Text style={styles.breakText}>
-                                                💳 <Text style={styles.metaBold}>${mp.toFixed(2)}</Text> → tarifas Mercado Pago
+                                                💳 <Text style={styles.metaBold}>${mp.toFixed(2)}</Text> → Tarifas Mercado Pago
                                             </Text>
                                             <Text style={styles.breakText}>
-                                                ⚙️ <Text style={styles.metaBold}>${nosotros.toFixed(2)}</Text> → plataforma
+                                                ⚙️ <Text style={styles.metaBold}>${nosotros.toFixed(2)}</Text> → Plataforma
                                             </Text>
                                             <Text style={styles.hintText}>Los porcentajes se calculan automáticamente.</Text>
                                         </>
@@ -351,12 +353,6 @@ export default function DetalleCampana() {
                                 <Text style={styles.payButtonText}>Donar con Mercado Pago</Text>
                             )}
                         </TouchableOpacity>
-
-                        {preferenceId && (
-                            <View style={{ marginTop: 10 }}>
-                                <Text style={{ color: "#374151" }}>Preference ID: {preferenceId}</Text>
-                            </View>
-                        )}
                     </View>
 
                     {/* Comentarios y últimas donaciones (componentes) */}

@@ -17,7 +17,7 @@ export default function IndexScreen() {
                 const hasSession = await checkSession();
                 setIsAuth(hasSession);
             } catch (error) {
-                console.error("Error al cargar la sesión:", error);
+                console.log("Error al cargar la sesión:", error);
                 setIsAuth(false);
             } finally {
                 setIsLoading(false);
