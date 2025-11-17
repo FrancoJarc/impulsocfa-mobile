@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { getAdmins, disableAdmin, updateAdmin } from "../../services/admin.service";
+import Toast from "react-native-toast-message";
+
 
 export default function AdminList() {
   const [admins, setAdmins] = useState([]);
@@ -16,11 +18,14 @@ export default function AdminList() {
       const data = await getAdmins();
       setAdmins(data);
     } catch (error) {
-      Alert.alert("Error", "❌ Error al cargar administradores");
+      Toast.show({
+        type: "error",
+        text1: "Error al cargar administradores",
+        text2: "Intentá nuevamente",
+      });
       console.error(error);
     }
   }
-
   function handleDisable(id) {
     Alert.alert(
       "Confirmación",
@@ -32,10 +37,20 @@ export default function AdminList() {
           onPress: async () => {
             try {
               await disableAdmin(id);
-              Alert.alert("Éxito", "Administrador deshabilitado ✅");
+
+              Toast.show({
+                type: "success",
+                text1: "Administrador deshabilitado",
+                text2: "El administrador fue desactivado correctamente",
+              });
+
               loadAdmins();
             } catch (error) {
-              Alert.alert("Error", "❌ Error al deshabilitar administrador");
+              Toast.show({
+                type: "error",
+                text1: "Error al deshabilitar",
+                text2: "No se pudo completar la acción",
+              });
               console.error(error);
             }
           },
@@ -52,11 +67,21 @@ export default function AdminList() {
   async function handleSave(id) {
     try {
       await updateAdmin(id, editData);
-      Alert.alert("Éxito", "Administrador actualizado ✅");
+
+      Toast.show({
+        type: "success",
+        text1: "Administrador actualizado",
+        text2: "Los cambios fueron guardados correctamente 🙂",
+      });
+
       setEditId(null);
       loadAdmins();
     } catch (error) {
-      Alert.alert("Error", "❌ Error al actualizar administrador");
+      Toast.show({
+        type: "error",
+        text1: "Error al actualizar",
+        text2: "Revisá los datos e intentá nuevamente",
+      });
       console.error(error);
     }
   }

@@ -4,9 +4,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { createAdmin } from "../../services/admin.service";
 
 export default function CreateAdminForm() {
@@ -25,10 +26,28 @@ export default function CreateAdminForm() {
   }
 
   async function handleSubmit() {
+    if (!formData.nombre.trim() ||
+        !formData.apellido.trim() ||
+        !formData.email.trim() ||
+        !formData.password.trim() ||
+        !formData.nacionalidad.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Campos incompletos",
+        text2: "Completá todos los datos antes de continuar.",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       await createAdmin(formData);
-      Alert.alert("✅ Administrador creado correctamente!");
+
+      Toast.show({
+        type: "success",
+        text1: "Administrador creado",
+        text2: "El administrador fue registrado exitosamente.",
+      });
 
       setFormData({
         nombre: "",
@@ -37,18 +56,27 @@ export default function CreateAdminForm() {
         password: "",
         nacionalidad: "",
       });
+
     } catch (error) {
-      Alert.alert("❌ Error", "Error al crear administrador: " + error.message);
+      Toast.show({
+        type: "error",
+        text1: "Error al crear administrador",
+        text2: error.message || "Intentalo nuevamente",
+      });
     } finally {
       setLoading(false);
     }
   }
 
+  const inputStyle =
+    "border-2 border-violet-200 bg-white p-3 rounded-xl shadow-sm";
+
   return (
     <ScrollView className="flex-1 p-4 bg-violet-50">
-      <View className="bg-white/80 p-6 rounded-2xl shadow-lg border border-violet-200">
-        <Text className="text-2xl font-bold text-violet-700 mb-4 flex-row">
-          ➕ Crear Nuevo Administrador
+      <View className="bg-white/80 p-6 rounded-3xl shadow-xl border border-violet-200">
+        
+        <Text className="text-3xl font-bold text-violet-700 mb-6">
+          ➕ Crear Administrador
         </Text>
 
         {/* Inputs */}
@@ -56,38 +84,38 @@ export default function CreateAdminForm() {
           <TextInput
             placeholder="Nombre"
             value={formData.nombre}
-            onChangeText={(text) => handleChange("nombre", text)}
-            className="border-2 border-violet-200 p-3 rounded-lg"
+            onChangeText={(t) => handleChange("nombre", t)}
+            className={inputStyle}
           />
 
           <TextInput
             placeholder="Apellido"
             value={formData.apellido}
-            onChangeText={(text) => handleChange("apellido", text)}
-            className="border-2 border-violet-200 p-3 rounded-lg"
+            onChangeText={(t) => handleChange("apellido", t)}
+            className={inputStyle}
           />
 
           <TextInput
             placeholder="Correo electrónico"
             value={formData.email}
-            onChangeText={(text) => handleChange("email", text)}
+            onChangeText={(t) => handleChange("email", t)}
             keyboardType="email-address"
-            className="border-2 border-violet-200 p-3 rounded-lg"
+            className={inputStyle}
           />
 
           <TextInput
             placeholder="Contraseña"
             secureTextEntry
             value={formData.password}
-            onChangeText={(text) => handleChange("password", text)}
-            className="border-2 border-violet-200 p-3 rounded-lg"
+            onChangeText={(t) => handleChange("password", t)}
+            className={inputStyle}
           />
 
           <TextInput
             placeholder="Nacionalidad"
             value={formData.nacionalidad}
-            onChangeText={(text) => handleChange("nacionalidad", text)}
-            className="border-2 border-violet-200 p-3 rounded-lg"
+            onChangeText={(t) => handleChange("nacionalidad", t)}
+            className={inputStyle}
           />
         </View>
 
@@ -95,11 +123,15 @@ export default function CreateAdminForm() {
         <TouchableOpacity
           disabled={loading}
           onPress={handleSubmit}
-          className="w-full bg-gradient-to-r from-violet-500 to-pink-500 py-3 rounded-lg shadow-md"
+          className="w-full bg-gradient-to-r from-violet-500 to-pink-500 py-3 rounded-xl shadow-md active:opacity-80"
         >
-          <Text className="text-white text-center font-semibold">
-            {loading ? "Creando..." : "Crear Administrador"}
-          </Text>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text className="text-white text-center text-lg font-semibold">
+              Crear Administrador
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </ScrollView>

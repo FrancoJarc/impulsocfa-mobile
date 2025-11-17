@@ -229,35 +229,193 @@ export default function Comments({ id_campana }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  scrollContainer: { paddingBottom: 40, paddingHorizontal: 16 },
-  header: { flexDirection: "row", alignItems: "center", marginBottom: 16, marginTop: 24 },
-  headerText: { fontSize: 24, fontWeight: "bold", color: "#7c3aed" },
+  container: {
+    flex: 1,
+    backgroundColor: "#fafafa",
+  },
 
-  newCommentBox: { backgroundColor: "#fff", borderRadius: 20, padding: 16, borderWidth: 1, borderColor: "#ddd", shadowColor: "#000", shadowOffset: {width:0,height:2}, shadowOpacity:0.1, shadowRadius:4, elevation:3 },
-  textInput: { minHeight: 100, backgroundColor: "#f9f9f9", borderRadius: 16, padding: 12, borderWidth: 1, borderColor: "#ddd", textAlignVertical: "top" },
+  scrollContainer: {
+    paddingBottom: 40,
+    paddingHorizontal: 16,
+  },
 
-  sendButton: { backgroundColor: "#6366f1", paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, flexDirection:'row', alignItems:'center' },
-  sendButtonText: { color: "#fff", fontWeight: "bold", marginLeft: 6 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    marginTop: 28,
+  },
 
-  emptyBox: { alignItems: "center", padding: 40, backgroundColor: "#f3f0ff", borderRadius: 16, borderWidth: 1, borderColor: "#ddd" },
-  emptyText: { color: "#888", fontSize: 16, marginTop: 8 },
-  emptySubText: { color: "#aaa", fontSize: 14 },
+  headerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#7c3aed",
+    marginLeft: 8,
+  },
 
-  commentBox: { backgroundColor: "#fff", borderRadius: 20, padding: 16, marginBottom: 12, shadowColor: "#000", shadowOffset: {width:0,height:2}, shadowOpacity:0.05, shadowRadius:4, elevation:2 },
-  commentHeader: { flexDirection: "row", justifyContent: "space-between", marginBottom: 8, alignItems: "flex-start" },
-  commentUser: { flexDirection: "row", alignItems: "center", flex: 1, gap: 8 },
-  avatar: { width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: "#ddd" },
-  userName: { fontWeight: "bold", color: "#333" },
-  userDate: { fontSize: 12, color: "#888" },
-  editDelete: { flexDirection: "row", gap: 8, marginTop: 4 },
+  /* NUEVO comentario */
+  newCommentBox: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: "#e5e3ff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+    marginBottom: 22, // más aire bajo el form
+  },
 
-  editBox: { backgroundColor: "#f5f3ff", borderRadius: 16, padding: 12 },
-  editButtons: { flexDirection: "row", justifyContent: "flex-end", gap: 8, marginTop: 8 },
-  saveButton: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: "#6366f1", borderRadius: 16 },
-  saveButtonText: { color: "#fff", fontWeight: "bold" },
-  cancelButton: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: "#ddd", borderRadius: 16 },
-  cancelButtonText: { color: "#333", fontWeight: "bold" },
+  textInput: {
+    minHeight: 100,
+    backgroundColor: "#f4f3ff",
+    borderRadius: 16,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#d8d6ff",
+    textAlignVertical: "top",
+    color: "#333",
+  },
 
-  commentText: { color: "#333", marginTop: 4, lineHeight: 20 },
+  sendButton: {
+    backgroundColor: "#6366f1",
+    paddingHorizontal: 22,
+    paddingVertical: 10,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+  },
+
+  sendButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+    marginLeft: 6,
+  },
+
+  /* Cuando NO hay comentarios → una sola tarjeta */
+  emptyBox: {
+    backgroundColor: "#f7f3ff",
+    borderRadius: 20,
+    padding: 40,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#e8e3ff",
+    marginTop: 10,
+  },
+
+  emptyText: {
+    color: "#7c3aed",
+    fontSize: 17,
+    fontWeight: "600",
+    marginTop: 12,
+  },
+
+  emptySubText: {
+    color: "#9a96c9",
+    fontSize: 14,
+    marginTop: 2,
+  },
+
+  /* Caja de cada comentario */
+  commentBox: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 16, // más espacio entre comentarios
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+
+  commentHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    alignItems: "flex-start",
+  },
+
+  commentUser: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: 10,
+  },
+
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+
+  userName: {
+    fontWeight: "600",
+    color: "#333",
+    fontSize: 15,
+  },
+
+  userDate: {
+    fontSize: 12,
+    color: "#888",
+  },
+
+  editDelete: {
+    flexDirection: "row",
+    gap: 12,
+    paddingTop: 4,
+  },
+
+  /* Modo edición */
+  editBox: {
+    backgroundColor: "#f4f2ff",
+    borderRadius: 16,
+    padding: 14,
+    marginTop: 6,
+  },
+
+  editButtons: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 10,
+    marginTop: 10,
+  },
+
+  saveButton: {
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    backgroundColor: "#6366f1",
+    borderRadius: 16,
+  },
+
+  saveButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+
+  cancelButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#ddd",
+    borderRadius: 16,
+  },
+
+  cancelButtonText: {
+    color: "#333",
+    fontWeight: "600",
+  },
+
+  commentText: {
+    color: "#444",
+    marginTop: 6,
+    lineHeight: 20,
+    fontSize: 15,
+  },
 });
