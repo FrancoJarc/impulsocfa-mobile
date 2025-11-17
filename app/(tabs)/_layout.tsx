@@ -1,7 +1,24 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function TabsLayout() {
+  const [role, setRole] = useState(null);
+
+  useEffect(() => {
+    const loadRole = async () => {
+      const data = await AsyncStorage.getItem("user");
+      if (!data) return;
+      const user = JSON.parse(data);
+      setRole(user.role); // user | admin
+    };
+    loadRole();
+  }, []);
+
+  // 🚨 IMPORTANTE: No mostrar tabs hasta cargar el rol
+  if (role === null) return null;
+
   return (
     <Tabs
       screenOptions={{
@@ -37,15 +54,27 @@ export default function TabsLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="perfil"
-        options={{
-          title: "Perfil",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" color={color} size={size} />
-          ),
-        }}
-      />
+      {role === "admin" ? (
+        <Tabs.Screen
+          name="admin"
+          options={{
+            title: "Admin",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="settings-outline" color={color} size={size} />
+            ),
+          }}
+        />
+      ) : (
+        <Tabs.Screen
+          name="perfil"
+          options={{
+            title: "Perfil",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="person-outline" color={color} size={size} />
+            ),
+          }}
+        />
+      )}
     </Tabs>
   );
 }
