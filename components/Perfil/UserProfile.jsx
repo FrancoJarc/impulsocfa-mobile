@@ -15,6 +15,8 @@ import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calendar, UserRound, Flag, Camera } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import CountryPicker from "react-native-country-picker-modal";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import {
   updateUserProfile,
@@ -35,9 +37,11 @@ export default function UserProfileMobile({ navigation }) {
   const [preview, setPreview] = useState(null);
   const [saving, setSaving] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
 
   // -------------------------------
-  // 🔹 Cargar usuario desde AsyncStorage (igual que WEB)
+  // 🔹 Cargar usuario desde AsyncStorage
   // -------------------------------
   useEffect(() => {
     async function loadUser() {
@@ -57,8 +61,10 @@ export default function UserProfileMobile({ navigation }) {
 
         setPreview(
           user.foto_perfil
-            ? `${API_URL}/${user.foto_perfil}`
-            : null
+            ? user.foto_perfil.startsWith("http")
+              ? user.foto_perfil
+              : `${API_URL}/${user.foto_perfil}`
+            : require("../../assets/images/default-avatar.png")
         );
       } catch (err) {
         console.log("Error cargando usuario:", err);
@@ -72,7 +78,7 @@ export default function UserProfileMobile({ navigation }) {
   // 🔹 Elegir imagen desde la galería
   // -------------------------------
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       base64: false,
       quality: 0.7,
     });
@@ -94,8 +100,6 @@ export default function UserProfileMobile({ navigation }) {
       if (!formData.foto_perfil) delete data.foto_perfil;
 
       const updatedUser = await updateUserProfile(data);
-
-      // Guardar en AsyncStorage (igual a localStorage en web)
       await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
 
       Alert.alert("✨ Éxito", "Perfil actualizado correctamente");
@@ -106,19 +110,18 @@ export default function UserProfileMobile({ navigation }) {
     }
   };
 
-  // Mostrar modal
+  // -------------------------------
+  // 🔹 Deshabilitar cuenta
+  // -------------------------------
   const confirmDisable = () => setModalVisible(true);
 
-  // Deshabilitar cuenta
   const disableAccountMobile = async () => {
     try {
       await disableUserAccount();
-
       await AsyncStorage.removeItem("user");
       await AsyncStorage.removeItem("access_token");
 
       Alert.alert("Cuenta deshabilitada", "Tu cuenta fue desactivada");
-
       navigation.replace("Login");
     } catch (err) {
       Alert.alert("Error", "No se pudo deshabilitar la cuenta");
@@ -128,7 +131,7 @@ export default function UserProfileMobile({ navigation }) {
   };
 
   // -------------------------------
-  // ⬇ UI — IGUAL A TU DISEÑO ORIGINAL
+  // ⬇ UI
   // -------------------------------
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -197,21 +200,85 @@ export default function UserProfileMobile({ navigation }) {
             icon={<UserRound size={20} color="#7c3aed" />}
           />
 
-          <Input
-            label="Fecha de nacimiento"
-            value={formData.fecha_nacimiento}
-            onChange={(t) => setFormData({ ...formData, fecha_nacimiento: t })}
-            icon={<Calendar size={20} color="#7c3aed" />}
+          {/* FECHA DE NACIMIENTO */}
+          <Text style={{ marginBottom: 6, fontWeight: "600", color: "#4b5563" }}>
+            Fecha de nacimiento
+          </Text>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#ede9fe",
+              borderRadius: 12,
+              padding: 12,
+              borderColor: "#c4b5fd",
+              borderWidth: 1,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Calendar size={20} color="#7c3aed" />
+            <Text style={{ marginLeft: 10, color: "#4b5563" }}>
+              {formData.fecha_nacimiento || "Selecciona tu fecha de nacimiento"}
+            </Text>
+          </TouchableOpacity>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={
+                formData.fecha_nacimiento
+                  ? new Date(formData.fecha_nacimiento)
+                  : new Date()
+              }
+              mode="date"
+              display="default"
+              maximumDate={new Date()}
+              onChange={(event, selectedDate) => {
+                setShowDatePicker(false);
+                if (selectedDate) {
+                  const isoDate = selectedDate.toISOString().split("T")[0];
+                  setFormData({ ...formData, fecha_nacimiento: isoDate });
+                }
+              }}
+            />
+          )}
+
+          {/* NACIONALIDAD */}
+          <Text style={{ marginBottom: 6, fontWeight: "600", color: "#4b5563" }}>
+            Nacionalidad
+          </Text>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#ede9fe",
+              borderRadius: 12,
+              padding: 12,
+              borderColor: "#c4b5fd",
+              borderWidth: 1,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+            onPress={() => setShowCountryPicker(true)}
+          >
+            <Flag size={20} color="#7c3aed" />
+            <Text style={{ marginLeft: 10, color: "#4b5563" }}>
+              {formData.nacionalidad || "Selecciona tu país"}
+            </Text>
+          </TouchableOpacity>
+
+          <CountryPicker
+            visible={showCountryPicker}
+            withFilter
+            withFlag
+            withAlphaFilter
+            withCountryNameButton={false}
+            renderFlagButton={() => null}
+            onSelect={(country) => {
+              setFormData({ ...formData, nacionalidad: country.name });
+              setShowCountryPicker(false);
+            }}
+            onClose={() => setShowCountryPicker(false)}
           />
 
-          <Input
-            label="Nacionalidad"
-            value={formData.nacionalidad}
-            onChange={(t) => setFormData({ ...formData, nacionalidad: t })}
-            icon={<Flag size={20} color="#7c3aed" />}
-          />
-
-          {/* GUARDAR */}
+          {/* BOTONES */}
           <TouchableOpacity
             onPress={updateProfile}
             disabled={saving}
@@ -232,7 +299,6 @@ export default function UserProfileMobile({ navigation }) {
             )}
           </TouchableOpacity>
 
-          {/* DESHABILITAR */}
           <TouchableOpacity
             onPress={confirmDisable}
             style={{
@@ -324,21 +390,13 @@ export default function UserProfileMobile({ navigation }) {
   );
 }
 
-/* COMPONENTE INPUT REUTILIZABLE */
+// Componente Input reutilizable
 function Input({ label, value, onChange, icon }) {
   return (
     <View style={{ marginBottom: 15 }}>
-      <Text
-        style={{
-          marginBottom: 6,
-          fontWeight: "600",
-          color: "#4b5563",
-          fontSize: 14,
-        }}
-      >
+      <Text style={{ marginBottom: 6, fontWeight: "600", color: "#4b5563", fontSize: 14 }}>
         {label}
       </Text>
-
       <View
         style={{
           backgroundColor: "#ede9fe",
@@ -355,12 +413,7 @@ function Input({ label, value, onChange, icon }) {
         <TextInput
           value={value}
           onChangeText={onChange}
-          style={{
-            marginLeft: 10,
-            flex: 1,
-            fontSize: 15,
-            color: "#4b5563",
-          }}
+          style={{ marginLeft: 10, flex: 1, fontSize: 15, color: "#4b5563" }}
         />
       </View>
     </View>

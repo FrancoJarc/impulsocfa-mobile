@@ -10,7 +10,7 @@ export default function PerfilHome() {
 
         {/* Mis campañas */}
         <TouchableOpacity
-          onPress={() => router.push("/perfil/MisCampanas")}
+          onPress={() => router.push("/(tabs)/perfil/MisCampanas")}
           style={styles.button}
         >
           <Text style={styles.buttonText}> Mis campañas</Text>
@@ -18,7 +18,7 @@ export default function PerfilHome() {
 
         {/* Donaciones recibidas */}
         <TouchableOpacity
-          onPress={() => router.push("/perfil/TodasDonaciones")}
+          onPress={() => router.push("/(tabs)/perfil/TodasDonaciones")}
           style={styles.button}
         >
           <Text style={styles.buttonText}>Donaciones de tus campañas</Text>
@@ -26,7 +26,7 @@ export default function PerfilHome() {
 
         {/* Crear campaña */}
         <TouchableOpacity
-          onPress={() => router.push("/perfil/CreateCampanaForm")}
+          onPress={() => router.push("/(tabs)/perfil/CreateCampanaForm")}
           style={styles.button}
         >
           <Text style={styles.buttonText}>➕ Crear campaña</Text>
@@ -34,7 +34,7 @@ export default function PerfilHome() {
 
         {/* Mi perfil */}
         <TouchableOpacity
-          onPress={() => router.push("/perfil/UserProfile")}
+          onPress={() => router.push("/(tabs)/perfil/UserProfile")}
           style={styles.button}
         >
           <Text style={styles.buttonText}>👤 Ver / editar mi perfil</Text>
