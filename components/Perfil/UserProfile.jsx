@@ -135,10 +135,7 @@ export default function UserProfileMobile({ navigation }) {
   // -------------------------------
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <LinearGradient
-        colors={["#ede9fe", "#e0f2fe", "#f5f3ff"]}
-        style={{ flex: 1, padding: 20 }}
-      >
+      <View style={{ flex: 1, padding: 20, backgroundColor: "#F8F5FF" }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
           <Text
             style={{
@@ -385,7 +382,7 @@ export default function UserProfileMobile({ navigation }) {
             </View>
           </View>
         </Modal>
-      </LinearGradient>
+      </View>
     </SafeAreaView>
   );
 }

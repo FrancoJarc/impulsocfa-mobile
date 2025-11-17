@@ -108,13 +108,30 @@ export default function MisCampanas() {
 
   if (loading)
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#f5f3ff",
+        }}
+      >
         <ActivityIndicator size="large" color="#6c47ff" />
+        <Text
+          style={{
+            marginTop: 12,
+            fontSize: 16,
+            color: "#6c47ff",
+            fontWeight: "600",
+          }}
+        >
+          Cargando campañas...
+        </Text>
       </View>
     );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f7fb" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f3ff" }}>
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 10 }}>
         
         {/* TITULO */}

@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import UltimasDonaciones from "../../components/Campanas/UltimasDonaciones";
-import Comments from "../../components/comentarios/Comments";
+import Comments from "../../components/Comentarios/Comments";
 import { getCampaignById } from "../../services/campaign.service";
 import { createPreference } from "../../services/payment.service"; // debe devolver { init_point, preference_id }
 

@@ -217,7 +217,7 @@ export default function CreateCampana() {
           style={styles.dateButton}
           onPress={() => setDatePickerVisible(true)}
         >
-          <Text style={{ color: "#4c1d95", fontWeight: "600" }}>
+          <Text style={{ color: "#807d85ff", fontWeight: "400" }}>
             {formData.tiempo_objetivo || "Seleccionar fecha"}
           </Text>
         </TouchableOpacity>

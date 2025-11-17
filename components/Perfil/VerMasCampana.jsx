@@ -12,7 +12,7 @@ import {
 import { useLocalSearchParams, router } from "expo-router";
 import { getCampaignById, suspendCampaign } from "../../services/campaign.service";
 import Toast from "react-native-toast-message";
-import Comments from "../../components/comentarios/Comments";
+import Comments from "../Comentarios/Comments";
 import UltimasDonaciones from "../Campanas/UltimasDonaciones";
 
 export default function VerMasCampana() {

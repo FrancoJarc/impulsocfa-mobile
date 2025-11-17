@@ -15,7 +15,7 @@ import Toast from "react-native-toast-message";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import { getCampaignById, suspendCampaign } from "../../services/campaign.service";
-import Comments from "../comentarios/Comments";
+import Comments from "../Comentarios/Comments";
 import UltimasDonaciones from "../../app/campanas/UltimasDonaciones";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");

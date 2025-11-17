@@ -75,29 +75,23 @@ export default function TodasDonaciones() {
   // LOADING
   if (loading)
     return (
-      <LinearGradient
-        colors={["#e0f2ff", "#f5e1ff", "#ffdfed"]}
-        style={styles.fullCenter}
-      >
+      <View style={[styles.fullCenter, { backgroundColor: "#f5f3ff" }]}>
         <ActivityIndicator size="large" color="#8b5cf6" />
         <Text style={styles.loadingText}>Cargando donaciones...</Text>
-      </LinearGradient>
+      </View>
     );
 
   // SIN DONACIONES
   if (donaciones.length === 0)
     return (
-      <LinearGradient
-        colors={["#e0f2ff", "#f5e1ff", "#ffdfed"]}
-        style={styles.fullCenter}
-      >
+      <View style={[styles.fullCenter, { backgroundColor: "#f5f3ff" }]}>
         <Text style={styles.emptyEmoji}>🎁</Text>
         <Trophy size={80} color="#c084fc" opacity={0.5} />
         <Text style={styles.emptyTitle}>Aún no recibiste donaciones</Text>
         <Text style={styles.emptySub}>
           ¡Comparte tus campañas para comenzar a recibir apoyo!
         </Text>
-      </LinearGradient>
+      </View>
     );
 
   return (
