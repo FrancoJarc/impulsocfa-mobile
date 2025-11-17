@@ -5,6 +5,7 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Toast from "react-native-toast-message";
@@ -141,47 +142,44 @@ export default function CategoryList() {
   }
 
   return (
-    <ScrollView className="flex-1 p-6">
+   <ScrollView style={styles.page}>
       <LinearGradient
         colors={["#fff0f5", "#ffe4e6"]}
-        className="rounded-2xl p-6 border-2 border-pink-100 shadow-md"
+        style={styles.container}
       >
-        <Text className="text-2xl font-bold text-pink-700 mb-6 flex-row">
-          📂 Categorías
-        </Text>
+        <Text style={styles.header}>📂 Categorías</Text>
 
-        {/* Form Nueva Categoría */}
-        <View className="flex-row gap-2 mb-6">
+        {/* Input de nueva categoría */}
+        <View style={styles.addRow}>
           <TextInput
             placeholder="Nueva categoría"
             value={newCategory}
             onChangeText={setNewCategory}
-            className="flex-1 border-2 border-pink-200 p-3 rounded-lg bg-white"
+            style={styles.newCategoryInput}
           />
-          <TouchableOpacity style={{ flexShrink: 0 }} onPress={handleCreate}>
+
+          <TouchableOpacity onPress={handleCreate}>
             <LinearGradient
               colors={["#ec4899", "#db2777"]}
-              className="px-5 py-3 rounded-lg"
+              style={styles.addButton}
             >
-              <Text className="text-white font-semibold">➕ Agregar</Text>
+              <Text style={styles.addButtonText}>➕ Agregar</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
 
         {/* Lista */}
         {categories.length === 0 ? (
-          <Text className="text-gray-500 text-center py-10">
-            No hay categorías aún.
-          </Text>
+          <Text style={styles.empty}>No hay categorías aún.</Text>
         ) : (
           categories.map((cat) => (
             <LinearGradient
               key={cat.id_categoria}
               colors={["#ffe4e6", "#fff1f2"]}
-              className="p-4 rounded-xl border-2 border-pink-100 mb-3 flex-row justify-between items-center"
+              style={styles.item}
             >
               {cat.isEditing ? (
-                <View className="flex-row flex-1 gap-2">
+                <View style={styles.editRow}>
                   <TextInput
                     value={cat.editName}
                     onChangeText={(text) => {
@@ -193,12 +191,12 @@ export default function CategoryList() {
                         )
                       );
                     }}
-                    className="flex-1 border-2 border-pink-200 p-2 rounded-lg bg-white"
+                    style={styles.editInput}
                   />
 
                   <TouchableOpacity onPress={() => handleSaveEdit(cat)}>
-                    <View className="bg-green-500 px-3 py-2 rounded-lg">
-                      <Text className="text-white font-semibold">✓</Text>
+                    <View style={styles.confirmButton}>
+                      <Text style={styles.confirmText}>✓</Text>
                     </View>
                   </TouchableOpacity>
 
@@ -207,24 +205,26 @@ export default function CategoryList() {
                       setCategories(
                         categories.map((c) =>
                           c.id_categoria === cat.id_categoria
-                            ? { ...c, isEditing: false, editName: c.nombre }
+                            ? {
+                                ...c,
+                                isEditing: false,
+                                editName: c.nombre,
+                              }
                             : c
                         )
                       )
                     }
                   >
-                    <View className="bg-gray-400 px-3 py-2 rounded-lg">
-                      <Text className="text-white font-semibold">✕</Text>
+                    <View style={styles.cancelButton}>
+                      <Text style={styles.cancelText}>✕</Text>
                     </View>
                   </TouchableOpacity>
                 </View>
               ) : (
                 <>
-                  <Text className="font-semibold text-gray-800 flex-1">
-                    {cat.nombre}
-                  </Text>
+                  <Text style={styles.itemName}>{cat.nombre}</Text>
 
-                  <View className="flex-row gap-3">
+                  <View style={styles.itemActions}>
                     <TouchableOpacity
                       onPress={() =>
                         setCategories(
@@ -236,13 +236,13 @@ export default function CategoryList() {
                         )
                       }
                     >
-                      <Text className="text-blue-600 font-semibold">✏️</Text>
+                      <Text style={styles.editIcon}>✏️</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                       onPress={() => confirmDelete(cat.id_categoria)}
                     >
-                      <Text className="text-red-600 font-semibold">🗑️</Text>
+                      <Text style={styles.deleteIcon}>🗑️</Text>
                     </TouchableOpacity>
                   </View>
                 </>
@@ -254,3 +254,132 @@ export default function CategoryList() {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    padding: 24,
+  },
+
+  container: {
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 2,
+    borderColor: "#fbcfe8",
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+  },
+
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#be185d",
+    marginBottom: 24,
+  },
+
+  addRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 24,
+    alignItems: "center",
+  },
+
+  newCategoryInput: {
+    flex: 1,
+    borderWidth: 2,
+    borderColor: "#f9a8d4",
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "white",
+  },
+
+  addButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+  },
+
+  addButtonText: {
+    color: "white",
+    fontWeight: "600",
+  },
+
+  empty: {
+    textAlign: "center",
+    color: "#6b7280",
+    paddingVertical: 40,
+  },
+
+  item: {
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: "#fbcfe8",
+    marginBottom: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  itemName: {
+    flex: 1,
+    fontWeight: "600",
+    color: "#1f2937",
+  },
+
+  itemActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+
+  editIcon: {
+    fontSize: 18,
+    color: "#2563eb",
+    fontWeight: "600",
+  },
+
+  deleteIcon: {
+    fontSize: 18,
+    color: "#dc2626",
+    fontWeight: "600",
+  },
+
+  editRow: {
+    flexDirection: "row",
+    flex: 1,
+    gap: 8,
+  },
+
+  editInput: {
+    flex: 1,
+    backgroundColor: "white",
+    borderWidth: 2,
+    borderColor: "#f9a8d4",
+    padding: 10,
+    borderRadius: 12,
+  },
+
+  confirmButton: {
+    backgroundColor: "#22c55e",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+  },
+  confirmText: {
+    color: "white",
+    fontWeight: "600",
+  },
+
+  cancelButton: {
+    backgroundColor: "#9ca3af",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+  },
+  cancelText: {
+    color: "white",
+    fontWeight: "600",
+  },
+});

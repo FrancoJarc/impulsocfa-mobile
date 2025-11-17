@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert,  StyleSheet,} from "react-native";
 import { getAdmins, disableAdmin, updateAdmin } from "../../services/admin.service";
 import Toast from "react-native-toast-message";
 
@@ -87,34 +87,31 @@ export default function AdminList() {
   }
 
   return (
-    <ScrollView className="p-4 bg-white">
-      <Text className="text-2xl font-bold text-violet-700 mb-4">👤 Lista de Administradores</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>👤 Lista de Administradores</Text>
 
       {admins.length === 0 ? (
-        <Text className="text-gray-500 text-center py-8">No hay administradores registrados.</Text>
+        <Text style={styles.noAdmins}>No hay administradores registrados.</Text>
       ) : (
         admins.map((admin) => (
-          <View
-            key={admin.id_usuario}
-            className="bg-violet-50 p-4 rounded-xl mb-4 border border-violet-100"
-          >
-            <View className="flex flex-col gap-2">
+          <View key={admin.id_usuario} style={styles.card}>
+            <View style={styles.infoContainer}>
               {editId === admin.id_usuario ? (
                 <>
                   <TextInput
-                    className="border border-violet-200 px-3 py-2 rounded-lg"
+                    style={styles.input}
                     placeholder="Nombre"
                     value={editData.nombre}
                     onChangeText={(text) => setEditData({ ...editData, nombre: text })}
                   />
                   <TextInput
-                    className="border border-violet-200 px-3 py-2 rounded-lg"
+                    style={styles.input}
                     placeholder="Apellido"
                     value={editData.apellido}
                     onChangeText={(text) => setEditData({ ...editData, apellido: text })}
                   />
                   <TextInput
-                    className="border border-violet-200 px-3 py-2 rounded-lg"
+                    style={styles.input}
                     placeholder="Email"
                     value={editData.email}
                     onChangeText={(text) => setEditData({ ...editData, email: text })}
@@ -122,42 +119,44 @@ export default function AdminList() {
                 </>
               ) : (
                 <>
-                  <Text className="font-semibold text-gray-800 text-lg">
+                  <Text style={styles.name}>
                     {admin.nombre} {admin.apellido}
                   </Text>
-                  <Text className="text-gray-600">{admin.email}</Text>
+                  <Text style={styles.email}>{admin.email}</Text>
                 </>
               )}
 
-              <View className="flex flex-row gap-2 mt-2 flex-wrap">
+              <View style={styles.buttonRow}>
                 {editId === admin.id_usuario ? (
                   <>
                     <TouchableOpacity
                       onPress={() => handleSave(admin.id_usuario)}
-                      className="bg-green-400 px-4 py-2 rounded-lg"
+                      style={[styles.button, styles.saveButton]}
                     >
-                      <Text className="text-white font-semibold text-center">✓ Guardar</Text>
+                      <Text style={styles.buttonText}>✓ Guardar</Text>
                     </TouchableOpacity>
+
                     <TouchableOpacity
                       onPress={() => setEditId(null)}
-                      className="bg-gray-300 px-4 py-2 rounded-lg"
+                      style={[styles.button, styles.cancelButton]}
                     >
-                      <Text className="text-gray-700 font-semibold text-center">✕ Cancelar</Text>
+                      <Text style={styles.cancelText}>✕ Cancelar</Text>
                     </TouchableOpacity>
                   </>
                 ) : (
                   <>
                     <TouchableOpacity
                       onPress={() => handleEditClick(admin)}
-                      className="bg-blue-400 px-4 py-2 rounded-lg"
+                      style={[styles.button, styles.editButton]}
                     >
-                      <Text className="text-white font-semibold text-center">✏️ Editar</Text>
+                      <Text style={styles.buttonText}>✏️ Editar</Text>
                     </TouchableOpacity>
+
                     <TouchableOpacity
                       onPress={() => handleDisable(admin.id_usuario)}
-                      className="bg-red-400 px-4 py-2 rounded-lg"
+                      style={[styles.button, styles.disableButton]}
                     >
-                      <Text className="text-white font-semibold text-center">🚫 Deshabilitar</Text>
+                      <Text style={styles.buttonText}>🚫 Deshabilitar</Text>
                     </TouchableOpacity>
                   </>
                 )}
@@ -169,3 +168,105 @@ export default function AdminList() {
     </ScrollView>
   );
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#F8F5FF",
+    padding: 16,
+  },
+
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#6d28d9",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+
+  noAdmins: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#6b7280",
+    marginTop: 40,
+  },
+
+  card: {
+    backgroundColor: "white",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    shadowColor: "#8b5cf6",
+    shadowOpacity: 0.12,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#e0e7ff",
+  },
+
+  infoContainer: {
+    flexDirection: "column",
+    gap: 10,
+  },
+
+  name: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1f2937",
+  },
+
+  email: {
+    fontSize: 15,
+    color: "#6b7280",
+  },
+
+  input: {
+    backgroundColor: "#f5f3ff",
+    borderWidth: 1,
+    borderColor: "#dcd4ff",
+    borderRadius: 10,
+    padding: 10,
+    color: "#4c1d95",
+  },
+
+  buttonRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 10,
+  },
+
+  button: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+
+  editButton: {
+    backgroundColor: "#3b82f6",
+  },
+
+  disableButton: {
+    backgroundColor: "#ef4444",
+  },
+
+  saveButton: {
+    backgroundColor: "#22c55e",
+  },
+
+  cancelButton: {
+    backgroundColor: "#e5e7eb",
+  },
+
+  cancelText: {
+    color: "#374151",
+    fontWeight: "600",
+  },
+});
