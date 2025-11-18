@@ -8,8 +8,9 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+
 import Toast from "react-native-toast-message";
+import AdminScreenWrapper from "./AdminScreenWrapper";
 
 import {
   getPendingCampaigns,
@@ -74,18 +75,17 @@ export default function CampaignList() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#7c3aed" />
-        <Text style={styles.loadingText}>Cargando campañas...</Text>
-      </View>
+       <AdminScreenWrapper>
+        <View style={styles.loadingWrapper}>
+          <ActivityIndicator size="large" color="#6d28d9" />
+          <Text style={styles.loadingText}>Cargando campañas...</Text>
+        </View>
+      </AdminScreenWrapper>
     );
   }
 
   return (
-   <LinearGradient
-      colors={["#f5f3ff", "#eff6ff", "#f3e8ff"]}
-      style={styles.container}
-    >
+    <AdminScreenWrapper>
       <Text style={styles.headerTitle}>📢 Campañas Pendientes</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -114,67 +114,52 @@ export default function CampaignList() {
               </Text>
 
               <Text style={styles.userText}>
-                Usuario:{" "}
+                Creado por{" "}
                 {c.usuario?.nombre
                   ? `${c.usuario.nombre} ${c.usuario.apellido}`
-                  : c.id_usuario}
+                  : `Usuario ${c.id_usuario}`}
               </Text>
 
               <View style={styles.buttonsRow}>
                 <TouchableOpacity
                   onPress={() => handleApprove(c.id_campana, true)}
-                  style={{ flex: 1 }}
+                  style={[styles.button, styles.approveButton]}
                 >
-                  <LinearGradient
-                    colors={["#4ade80", "#10b981"]}
-                    style={styles.button}
-                  >
-                    <Text style={styles.buttonText}>✓ Aprobar</Text>
-                  </LinearGradient>
+                  <Text style={styles.buttonText}>✓ Aprobar</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={() => handleApprove(c.id_campana, false)}
-                  style={{ flex: 1 }}
+                  style={[styles.button, styles.rejectButton]}
                 >
-                  <LinearGradient
-                    colors={["#f87171", "#ec4899"]}
-                    style={styles.button}
-                  >
-                    <Text style={styles.buttonText}>✕ Rechazar</Text>
-                  </LinearGradient>
+                  <Text style={styles.buttonText}>✕ Rechazar</Text>
                 </TouchableOpacity>
               </View>
             </View>
           ))
         )}
       </ScrollView>
-    </LinearGradient>
+    </AdminScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f3ff",
-  },
-  loadingText: {
-    marginTop: 10,
-    color: "#4b5563",
-  },
-
   headerTitle: {
     fontSize: 28,
     fontWeight: "bold",
     color: "#6d28d9",
     marginBottom: 20,
+    textAlign: "center",
+  },
+
+  loadingWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 10,
+    color: "#4c1d95",
   },
 
   emptyText: {
@@ -185,14 +170,14 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "rgba(255,255,255,0.8)",
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#ddd6fe",
+    borderColor: "#e0e7ff",
     padding: 20,
     marginBottom: 24,
 
-    shadowColor: "#000",
+    shadowColor: "#8b5cf6",
     shadowOpacity: 0.15,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
@@ -202,39 +187,40 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 180,
-    borderRadius: 12,
+    borderRadius: 14,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#e0e7ff",
     resizeMode: "cover",
   },
 
   title: {
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "700",
     marginBottom: 8,
+    color: "#4c1d95",
   },
 
   description: {
-    color: "#334155",
+    color: "#4b5563",
     marginBottom: 12,
   },
 
   metaText: {
-    color: "#475569",
-    fontSize: 14,
-    marginBottom: 4,
+    color: "#4b5563",
+    fontSize: 15,
+    marginBottom: 6,
   },
   metaLabel: {
-    color: "#7c3aed",
-    fontWeight: "600",
+    color: "#6d28d9",
+    fontWeight: "700",
   },
 
   userText: {
     color: "#6b7280",
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 15,
     marginBottom: 16,
+    fontWeight: "600",
   },
 
   buttonsRow: {
@@ -243,13 +229,23 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    padding: 12,
-    borderRadius: 10,
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+
+  approveButton: {
+    backgroundColor: "#22c55e",
+  },
+
+  rejectButton: {
+    backgroundColor: "#ef4444",
   },
 
   buttonText: {
     color: "white",
-    textAlign: "center",
-    fontWeight: "600",
+    fontWeight: "700",
+    fontSize: 16,
   },
 });

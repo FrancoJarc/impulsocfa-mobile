@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Toast from "react-native-toast-message";
+import AdminScreenWrapper from "./AdminScreenWrapper";
 
 import {
   getCategories,
@@ -142,116 +143,114 @@ export default function CategoryList() {
   }
 
   return (
-   <ScrollView style={styles.page}>
-      <LinearGradient
-        colors={["#fff0f5", "#ffe4e6"]}
-        style={styles.container}
-      >
-        <Text style={styles.header}>📂 Categorías</Text>
+    <AdminScreenWrapper title="Categorías">
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 10 }}>
+        <LinearGradient
+          colors={["#fff0f5", "#ffe4e6"]}
+          style={styles.container}
+        >
+          {/* Header */}
+          <Text style={styles.header}>📂 Categorías</Text>
 
-        {/* Input de nueva categoría */}
-        <View style={styles.addRow}>
-          <TextInput
-            placeholder="Nueva categoría"
-            value={newCategory}
-            onChangeText={setNewCategory}
-            style={styles.newCategoryInput}
-          />
+          {/* Crear categoría */}
+          <View style={styles.addRow}>
+            <TextInput
+              placeholder="Nueva categoría"
+              value={newCategory}
+              onChangeText={setNewCategory}
+              style={styles.newCategoryInput}
+            />
 
-          <TouchableOpacity onPress={handleCreate}>
-            <LinearGradient
-              colors={["#ec4899", "#db2777"]}
-              style={styles.addButton}
-            >
-              <Text style={styles.addButtonText}>➕ Agregar</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity onPress={handleCreate}>
+              <LinearGradient
+                colors={["#ec4899", "#db2777"]}
+                style={styles.addButton}
+              >
+                <Text style={styles.addButtonText}>➕</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
 
-        {/* Lista */}
-        {categories.length === 0 ? (
-          <Text style={styles.empty}>No hay categorías aún.</Text>
-        ) : (
-          categories.map((cat) => (
-            <LinearGradient
-              key={cat.id_categoria}
-              colors={["#ffe4e6", "#fff1f2"]}
-              style={styles.item}
-            >
-              {cat.isEditing ? (
-                <View style={styles.editRow}>
-                  <TextInput
-                    value={cat.editName}
-                    onChangeText={(text) => {
-                      setCategories(
-                        categories.map((c) =>
-                          c.id_categoria === cat.id_categoria
-                            ? { ...c, editName: text }
-                            : c
-                        )
-                      );
-                    }}
-                    style={styles.editInput}
-                  />
+          {/* Lista */}
+          {categories.length === 0 ? (
+            <Text style={styles.empty}>No hay categorías aún.</Text>
+          ) : (
+            categories.map((cat) => (
+              <LinearGradient
+                key={cat.id_categoria}
+                colors={["#ffe4e6", "#fff1f2"]}
+                style={styles.item}
+              >
+                {cat.isEditing ? (
+                  <View style={styles.editRow}>
+                    <TextInput
+                      value={cat.editName}
+                      onChangeText={(text) => {
+                        setCategories(
+                          categories.map((c) =>
+                            c.id_categoria === cat.id_categoria
+                              ? { ...c, editName: text }
+                              : c
+                          )
+                        );
+                      }}
+                      style={styles.editInput}
+                    />
+                    <TouchableOpacity onPress={() => handleSaveEdit(cat)}>
+                      <View style={styles.confirmButton}>
+                        <Text style={styles.confirmText}>✓</Text>
+                      </View>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => handleSaveEdit(cat)}>
-                    <View style={styles.confirmButton}>
-                      <Text style={styles.confirmText}>✓</Text>
-                    </View>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    onPress={() =>
-                      setCategories(
-                        categories.map((c) =>
-                          c.id_categoria === cat.id_categoria
-                            ? {
-                                ...c,
-                                isEditing: false,
-                                editName: c.nombre,
-                              }
-                            : c
-                        )
-                      )
-                    }
-                  >
-                    <View style={styles.cancelButton}>
-                      <Text style={styles.cancelText}>✕</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <>
-                  <Text style={styles.itemName}>{cat.nombre}</Text>
-
-                  <View style={styles.itemActions}>
                     <TouchableOpacity
                       onPress={() =>
                         setCategories(
                           categories.map((c) =>
                             c.id_categoria === cat.id_categoria
-                              ? { ...c, isEditing: true }
+                              ? { ...c, isEditing: false, editName: c.nombre }
                               : c
                           )
                         )
                       }
                     >
-                      <Text style={styles.editIcon}>✏️</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      onPress={() => confirmDelete(cat.id_categoria)}
-                    >
-                      <Text style={styles.deleteIcon}>🗑️</Text>
+                      <View style={styles.cancelButton}>
+                        <Text style={styles.cancelText}>✕</Text>
+                      </View>
                     </TouchableOpacity>
                   </View>
-                </>
-              )}
-            </LinearGradient>
-          ))
-        )}
-      </LinearGradient>
-    </ScrollView>
+                ) : (
+                  <>
+                    <Text style={styles.itemName}>{cat.nombre}</Text>
+
+                    <View style={styles.itemActions}>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setCategories(
+                            categories.map((c) =>
+                              c.id_categoria === cat.id_categoria
+                                ? { ...c, isEditing: true }
+                                : c
+                            )
+                          )
+                        }
+                      >
+                        <Text style={styles.editIcon}>✏️</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        onPress={() => confirmDelete(cat.id_categoria)}
+                      >
+                        <Text style={styles.deleteIcon}>🗑️</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </>
+                )}
+              </LinearGradient>
+            ))
+          )}
+        </LinearGradient>
+      </ScrollView>
+    </AdminScreenWrapper>
   );
 }
 
@@ -313,7 +312,9 @@ const styles = StyleSheet.create({
   },
 
   item: {
-    padding: 16,
+    width: "100%",
+    paddingVertical: 18,
+    paddingHorizontal: 20,
     borderRadius: 16,
     borderWidth: 2,
     borderColor: "#fbcfe8",
