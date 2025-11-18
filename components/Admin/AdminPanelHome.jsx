@@ -1,5 +1,7 @@
 import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function AdminPanelHome() {
   return (
@@ -7,25 +9,36 @@ export default function AdminPanelHome() {
       <View style={styles.card}>
         <Text style={styles.title}>Panel de Administración</Text>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/app/admin/AdminList")}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/adminPanel/AdminList")}>
           <Text style={styles.buttonText}>👤 Administradores</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/app/admin/UserList")}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/adminPanel/UserList")}>
           <Text style={styles.buttonText}>👥 Usuarios</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/app/admin/CategoryList")}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/adminPanel/CategoryList")}>
           <Text style={styles.buttonText}>📂 Categorías</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/app/admin/CampanasList")}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/adminPanel/CampanasList")}>
           <Text style={styles.buttonText}>📢 Campañas</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/app/admin/CreateAdminForm")}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/(tabs)/adminPanel/CreateAdminForm")}>
           <Text style={styles.buttonText}>➕ Crear Administrador</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={async () => {
+            await AsyncStorage.removeItem("access_token");
+            router.replace("/(auth)/iniciarsesion");
+          }}
+          style={[styles.button, styles.logoutButton]}
+        >
+          <Text style={[styles.buttonText, styles.logoutText]}>Cerrar sesión</Text>
+        </TouchableOpacity>
+        
       </View>
     </ScrollView>
   );
@@ -81,5 +94,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#4c1d95",
     textAlign: "center",
+  },
+
+  logoutButton: {
+    backgroundColor: "#fee2e2",
+    borderColor: "#fecaca",
+  },
+
+  logoutText: {
+    color: "#b91c1c",
   },
 });

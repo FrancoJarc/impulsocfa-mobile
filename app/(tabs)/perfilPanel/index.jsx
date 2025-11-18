@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { router } from "expo-router";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function PerfilHome() {
   return (
@@ -10,7 +10,7 @@ export default function PerfilHome() {
 
         {/* Mis campañas */}
         <TouchableOpacity
-          onPress={() => router.push("/perfil/MisCampanas")}
+          onPress={() => router.push("/(tabs)/perfilPanel/MisCampanas")}
           style={styles.button}
         >
           <Text style={styles.buttonText}> Mis campañas</Text>
@@ -18,7 +18,7 @@ export default function PerfilHome() {
 
         {/* Donaciones recibidas */}
         <TouchableOpacity
-          onPress={() => router.push("/perfil/TodasDonaciones")}
+          onPress={() => router.push("/(tabs)/perfilPanel/TodasDonaciones")}
           style={styles.button}
         >
           <Text style={styles.buttonText}>Donaciones de tus campañas</Text>
@@ -26,7 +26,7 @@ export default function PerfilHome() {
 
         {/* Crear campaña */}
         <TouchableOpacity
-          onPress={() => router.push("/perfil/CreateCampanaForm")}
+          onPress={() => router.push("/(tabs)/perfilPanel/CreateCampanaForm")}
           style={styles.button}
         >
           <Text style={styles.buttonText}>➕ Crear campaña</Text>
@@ -34,7 +34,7 @@ export default function PerfilHome() {
 
         {/* Mi perfil */}
         <TouchableOpacity
-          onPress={() => router.push("/perfil/UserProfile")}
+          onPress={() => router.push("/(tabs)/perfilPanel/UserProfile")}
           style={styles.button}
         >
           <Text style={styles.buttonText}>👤 Ver / editar mi perfil</Text>

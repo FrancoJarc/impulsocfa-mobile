@@ -54,27 +54,31 @@ export default function TabsLayout() {
         }}
       />
 
-      {role === "admin" ? (
-        <Tabs.Screen
-          name="admin"
-          options={{
-            title: "Admin",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="settings-outline" color={color} size={size} />
-            ),
-          }}
-        />
-      ) : (
-        <Tabs.Screen
-          name="perfil"
-          options={{
-            title: "Perfil",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="person-outline" color={color} size={size} />
-            ),
-          }}
-        />
-      )}
+      <Tabs.Screen
+        name="perfil"
+        options={{
+          title: "Perfil",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" color={color} size={size} />
+          ),
+        }}
+      />
+
+
+      <Tabs.Screen
+        name="adminPanel"
+        options={{
+          href: null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="perfilPanel"
+        options={{
+          href: null,
+        }}
+      />
+
     </Tabs>
   );
 }
