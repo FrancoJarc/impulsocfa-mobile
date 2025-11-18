@@ -4,10 +4,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   ScrollView,
+  ActivityIndicator,
+  StyleSheet,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { createAdmin } from "../../services/admin.service";
+import CountryPicker from "react-native-country-picker-modal";
 
 export default function CreateAdminForm() {
   const [formData, setFormData] = useState({
@@ -19,16 +22,36 @@ export default function CreateAdminForm() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
+
 
   function handleChange(name, value) {
     setFormData({ ...formData, [name]: value });
   }
 
   async function handleSubmit() {
+    if (!formData.nombre.trim() ||
+      !formData.apellido.trim() ||
+      !formData.email.trim() ||
+      !formData.password.trim() ||
+      !formData.nacionalidad.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Campos incompletos",
+        text2: "Completá todos los datos antes de continuar.",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       await createAdmin(formData);
-      Alert.alert("✅ Administrador creado correctamente!");
+
+      Toast.show({
+        type: "success",
+        text1: "Administrador creado",
+        text2: "El administrador fue registrado exitosamente.",
+      });
 
       setFormData({
         nombre: "",
@@ -37,57 +60,79 @@ export default function CreateAdminForm() {
         password: "",
         nacionalidad: "",
       });
+
     } catch (error) {
-      Alert.alert("❌ Error", "Error al crear administrador: " + error.message);
+      Toast.show({
+        type: "error",
+        text1: "Error al crear administrador",
+        text2: error.message || "Intentalo nuevamente",
+      });
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <ScrollView className="flex-1 p-4 bg-violet-50">
-      <View className="bg-white/80 p-6 rounded-2xl shadow-lg border border-violet-200">
-        <Text className="text-2xl font-bold text-violet-700 mb-4 flex-row">
-          ➕ Crear Nuevo Administrador
-        </Text>
+   <ScrollView style={styles.container}>
+      <View style={styles.card}>
+        <Text style={styles.title}>➕ Crear Administrador</Text>
 
         {/* Inputs */}
-        <View className="flex-col gap-4 mb-6">
+        <View style={styles.inputsWrapper}>
           <TextInput
             placeholder="Nombre"
             value={formData.nombre}
-            onChangeText={(text) => handleChange("nombre", text)}
-            className="border-2 border-violet-200 p-3 rounded-lg"
+            onChangeText={(t) => handleChange("nombre", t)}
+            style={styles.input}
           />
 
           <TextInput
             placeholder="Apellido"
             value={formData.apellido}
-            onChangeText={(text) => handleChange("apellido", text)}
-            className="border-2 border-violet-200 p-3 rounded-lg"
+            onChangeText={(t) => handleChange("apellido", t)}
+            style={styles.input}
           />
 
           <TextInput
             placeholder="Correo electrónico"
             value={formData.email}
-            onChangeText={(text) => handleChange("email", text)}
+            onChangeText={(t) => handleChange("email", t)}
             keyboardType="email-address"
-            className="border-2 border-violet-200 p-3 rounded-lg"
+            style={styles.input}
           />
 
           <TextInput
             placeholder="Contraseña"
             secureTextEntry
             value={formData.password}
-            onChangeText={(text) => handleChange("password", text)}
-            className="border-2 border-violet-200 p-3 rounded-lg"
+            onChangeText={(t) => handleChange("password", t)}
+            style={styles.input}
           />
 
-          <TextInput
-            placeholder="Nacionalidad"
-            value={formData.nacionalidad}
-            onChangeText={(text) => handleChange("nacionalidad", text)}
-            className="border-2 border-violet-200 p-3 rounded-lg"
+    {/* Nacionalidad */}
+          <Text style={styles.label}>Nacionalidad</Text>
+
+          <TouchableOpacity
+            style={styles.countryButton}
+            onPress={() => setShowCountryPicker(true)}
+          >
+            <Text style={styles.countryText}>
+              {formData.nacionalidad || "Selecciona tu país"}
+            </Text>
+          </TouchableOpacity>
+
+          <CountryPicker
+            visible={showCountryPicker}
+            withFilter
+            withFlag
+            withAlphaFilter
+            withCountryNameButton={false}
+            renderFlagButton={() => null}
+            onSelect={(country) => {
+              handleChange("nacionalidad", country.name);
+              setShowCountryPicker(false);
+            }}
+            onClose={() => setShowCountryPicker(false)}
           />
         </View>
 
@@ -95,13 +140,76 @@ export default function CreateAdminForm() {
         <TouchableOpacity
           disabled={loading}
           onPress={handleSubmit}
-          className="w-full bg-gradient-to-r from-violet-500 to-pink-500 py-3 rounded-lg shadow-md"
+          style={styles.button}
+          activeOpacity={0.8}
         >
-          <Text className="text-white text-center font-semibold">
-            {loading ? "Creando..." : "Crear Administrador"}
-          </Text>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Crear Administrador</Text>
+          )}
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#F3E8FF", // bg-violet-50
+  },
+
+  card: {
+    backgroundColor: "rgba(255,255,255,0.8)",
+    padding: 24,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "#E9D5FF", // border-violet-200
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#6D28D9", // violet-700
+    marginBottom: 24,
+  },
+
+  inputsWrapper: {
+    gap: 16,
+    marginBottom: 24,
+  },
+
+  input: {
+    borderWidth: 2,
+    borderColor: "#E9D5FF", // border-violet-200
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+
+  button: {
+    width: "100%",
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#A855F7", // fallback for gradient
+    elevation: 3,
+  },
+
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    textAlign: "center",
+    fontWeight: "600",
+  },
+});

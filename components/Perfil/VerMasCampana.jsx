@@ -229,9 +229,14 @@ export default function VerMasCampana() {
             <Text style={styles.actionText}>Suspender</Text>
           </TouchableOpacity>
         </View>
-        <Comments id_campana={campaignId} />
-        <UltimasDonaciones id_campana={campaignId} />  
-        
+        <View style={{ padding: 13 }}>
+          <Comments id_campana={campaignId} />
+
+          <View style={{ height: 12 }} /> {/* separador */}
+
+          <UltimasDonaciones id_campana={campaignId} />
+        </View>
+
       </View>
     </ScrollView>
   );

@@ -267,11 +267,14 @@ export default function VerMasCampana() {
                 </View>
 
                 {/* Comentarios y últimas donaciones */}
-                <View style={{ marginTop: 12 }}>
-                    {/* Asegurate de tener estos componentes en su versión RN o crea placeholders */}
-                    <Comments id_campana={id} />
-                    <UltimasDonaciones id_campana={id} />
+                <View style={{ padding: 16 }}>
+                    <Comments id_campana={campaignId} />
+
+                    <View style={{ height: 12 }} /> {/* separador */}
+
+                    <UltimasDonaciones id_campana={campaignId} />
                 </View>
+
             </View>
 
             {/* Toast (si no lo montaste global en app/_layout, descomenta esta línea) */}
