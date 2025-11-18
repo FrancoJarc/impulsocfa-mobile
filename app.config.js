@@ -14,6 +14,7 @@ export default {
       supportsTablet: true
     },
     android: {
+      package: "com.francojarc.impulsocfa",
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
         foregroundImage: "./assets/images/android-icon-foreground.png",
@@ -49,6 +50,9 @@ export default {
 
     extra: {
       EXPO_PUBLIC_API_URL: "https://impulsocfa-back.onrender.com/api",
+      eas: {
+        projectId: "d1506a12-b77f-456b-9b52-1475a60bdddd"
+      }
     },
   },
 };
