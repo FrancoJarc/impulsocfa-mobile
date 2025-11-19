@@ -80,6 +80,7 @@ export default function IniciarSesionForm() {
                         autoCapitalize="none"
                         name="email"
                         placeholder="E-mail"
+                        placeholderTextColor="#6b7280"
                         value={formData.email}
                         onChangeText={(v) => handleChange("email", v)}
                         style={styles.input}
@@ -91,6 +92,7 @@ export default function IniciarSesionForm() {
                         secureTextEntry
                         name="password"
                         placeholder="Contraseña"
+                        placeholderTextColor="#6b7280"
                         value={formData.password}
                         onChangeText={(v) => handleChange("password", v)}
                         style={styles.input}

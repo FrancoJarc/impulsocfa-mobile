@@ -151,6 +151,7 @@ export default function CategoryList() {
       <View style={styles.addRow}>
         <TextInput
           placeholder="Nueva categoría"
+          placeholderTextColor="#6b7280"
           value={newCategory}
           onChangeText={setNewCategory}
           style={styles.newCategoryInput}

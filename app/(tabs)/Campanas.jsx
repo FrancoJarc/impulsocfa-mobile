@@ -106,6 +106,7 @@ export default function Campanas() {
                     />
                     <TextInput
                         placeholder="Buscar campañas (mínimo 3 caracteres)"
+                        placeholderTextColor="#6b7280"
                         value={searchQuery}
                         onChangeText={setSearchQuery}
                         style={styles.input}

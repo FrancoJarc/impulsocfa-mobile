@@ -83,6 +83,7 @@ export default function CreateAdminForm() {
           <Text style={styles.label}>Nombre</Text>
           <TextInput
             placeholder="Nombre"
+            placeholderTextColor="#6b7280"
             value={formData.nombre}
             onChangeText={(t) => handleChange("nombre", t)}
             style={styles.input}
@@ -92,6 +93,7 @@ export default function CreateAdminForm() {
           <Text style={styles.label}>Apellido</Text>
           <TextInput
             placeholder="Apellido"
+            placeholderTextColor="#6b7280"
             value={formData.apellido}
             onChangeText={(t) => handleChange("apellido", t)}
             style={styles.input}
@@ -101,6 +103,7 @@ export default function CreateAdminForm() {
           <Text style={styles.label}>Correo electrónico</Text>
           <TextInput
             placeholder="Correo electrónico"
+            placeholderTextColor="#6b7280"
             value={formData.email}
             onChangeText={(t) => handleChange("email", t)}
             keyboardType="email-address"
@@ -111,6 +114,7 @@ export default function CreateAdminForm() {
           <Text style={styles.label}>Contraseña</Text>
           <TextInput
             placeholder="Contraseña"
+            placeholderTextColor="#6b7280"
             secureTextEntry
             value={formData.password}
             onChangeText={(t) => handleChange("password", t)}
@@ -164,7 +168,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "bold",
     color: "#6D28D9",
-    marginBottom: 24,
+    marginBottom: 10,
     textAlign: "center",
   },
 
