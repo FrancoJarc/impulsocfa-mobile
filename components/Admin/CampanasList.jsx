@@ -39,12 +39,6 @@ export default function CampaignList() {
       );
 
       setCampaigns(detailed);
-
-      Toast.show({
-        type: "success",
-        text1: "Campañas cargadas",
-        text2: "Pendientes cargadas correctamente",
-      });
     } catch (error) {
       console.error(error);
       Toast.show({
@@ -99,7 +93,7 @@ export default function CampaignList() {
         />
 
         {/* Título */}
-        <View style={{ paddingHorizontal: 20, marginTop: 10 }}>
+        <View style={{ paddingHorizontal: 20, marginTop: 25 }}>
           <Text style={styles.headerTitle}>📢 Campañas Pendientes</Text>
         </View>
 
@@ -159,14 +153,6 @@ export default function CampaignList() {
                     </Text>
                   </View>
                 </View>
-
-                {/* Usuario */}
-                <Text style={styles.userText}>
-                  Creado por{" "}
-                  {c.usuario?.nombre
-                    ? `${c.usuario.nombre} ${c.usuario.apellido}`
-                    : `Usuario ${c.id_usuario}`}
-                </Text>
 
                 {/* Botones */}
                 <View style={styles.buttonsRow}>

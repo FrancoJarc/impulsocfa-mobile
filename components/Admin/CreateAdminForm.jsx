@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
@@ -25,17 +24,18 @@ export default function CreateAdminForm() {
   const [loading, setLoading] = useState(false);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
 
-
   function handleChange(name, value) {
     setFormData({ ...formData, [name]: value });
   }
 
   async function handleSubmit() {
-    if (!formData.nombre.trim() ||
+    if (
+      !formData.nombre.trim() ||
       !formData.apellido.trim() ||
       !formData.email.trim() ||
       !formData.password.trim() ||
-      !formData.nacionalidad.trim()) {
+      !formData.nacionalidad.trim()
+    ) {
       Toast.show({
         type: "error",
         text1: "Campos incompletos",
@@ -61,7 +61,6 @@ export default function CreateAdminForm() {
         password: "",
         nacionalidad: "",
       });
-
     } catch (error) {
       Toast.show({
         type: "error",
@@ -74,89 +73,93 @@ export default function CreateAdminForm() {
   }
 
   return (
- <AdminScreenWrapper title="Crear Administrador">
-      
-        <View style={styles.card}>
-          <Text style={styles.title}>➕ Nuevo Administrador</Text>
+    <AdminScreenWrapper title="Crear Administrador">
+      <View style={styles.card}>
+        <Text style={styles.title}>➕ Nuevo Administrador</Text>
 
-          <View style={styles.inputsWrapper}>
-            <TextInput
-              placeholder="Nombre"
-              value={formData.nombre}
-              onChangeText={(t) => handleChange("nombre", t)}
-              style={styles.input}
-            />
+        <View style={styles.inputsWrapper}>
 
-            <TextInput
-              placeholder="Apellido"
-              value={formData.apellido}
-              onChangeText={(t) => handleChange("apellido", t)}
-              style={styles.input}
-            />
+          {/* Nombre */}
+          <Text style={styles.label}>Nombre</Text>
+          <TextInput
+            placeholder="Nombre"
+            value={formData.nombre}
+            onChangeText={(t) => handleChange("nombre", t)}
+            style={styles.input}
+          />
 
-            <TextInput
-              placeholder="Correo electrónico"
-              value={formData.email}
-              onChangeText={(t) => handleChange("email", t)}
-              keyboardType="email-address"
-              style={styles.input}
-            />
+          {/* Apellido */}
+          <Text style={styles.label}>Apellido</Text>
+          <TextInput
+            placeholder="Apellido"
+            value={formData.apellido}
+            onChangeText={(t) => handleChange("apellido", t)}
+            style={styles.input}
+          />
 
-            <TextInput
-              placeholder="Contraseña"
-              secureTextEntry
-              value={formData.password}
-              onChangeText={(t) => handleChange("password", t)}
-              style={styles.input}
-            />
+          {/* Email */}
+          <Text style={styles.label}>Correo electrónico</Text>
+          <TextInput
+            placeholder="Correo electrónico"
+            value={formData.email}
+            onChangeText={(t) => handleChange("email", t)}
+            keyboardType="email-address"
+            style={styles.input}
+          />
 
-            {/* Nacionalidad */}
-            <Text style={styles.label}>Nacionalidad</Text>
+          {/* Password */}
+          <Text style={styles.label}>Contraseña</Text>
+          <TextInput
+            placeholder="Contraseña"
+            secureTextEntry
+            value={formData.password}
+            onChangeText={(t) => handleChange("password", t)}
+            style={styles.input}
+          />
 
-            <TouchableOpacity
-              style={styles.countryButton}
-              onPress={() => setShowCountryPicker(true)}
-            >
-              <Text style={styles.countryText}>
-                {formData.nacionalidad || "Selecciona tu país"}
-              </Text>
-            </TouchableOpacity>
-
-            <CountryPicker
-              visible={showCountryPicker}
-              withFilter
-              withFlag
-              withAlphaFilter
-              renderFlagButton={() => null}
-              onSelect={(country) => {
-                handleChange("nacionalidad", country.name);
-                setShowCountryPicker(false);
-              }}
-              onClose={() => setShowCountryPicker(false)}
-            />
-          </View>
-
+          {/* Nacionalidad */}
+          <Text style={styles.label}>Nacionalidad</Text>
           <TouchableOpacity
-            disabled={loading}
-            onPress={handleSubmit}
-            style={styles.button}
-            activeOpacity={0.8}
+            style={styles.countryButton}
+            onPress={() => setShowCountryPicker(true)}
           >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Crear Administrador</Text>
-            )}
+            <Text style={styles.countryText}>
+              {formData.nacionalidad || "Selecciona tu país"}
+            </Text>
           </TouchableOpacity>
+
+          <CountryPicker
+            visible={showCountryPicker}
+            withFilter
+            withFlag
+            withAlphaFilter
+            renderFlagButton={() => null}
+            onSelect={(country) => {
+              handleChange("nacionalidad", country.name);
+              setShowCountryPicker(false);
+            }}
+            onClose={() => setShowCountryPicker(false)}
+          />
         </View>
-   
+
+        <TouchableOpacity
+          disabled={loading}
+          onPress={handleSubmit}
+          style={styles.button}
+          activeOpacity={0.8}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Crear Administrador</Text>
+          )}
+        </TouchableOpacity>
+      </View>
     </AdminScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-
-
   title: {
     fontSize: 26,
     fontWeight: "bold",
