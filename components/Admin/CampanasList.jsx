@@ -17,6 +17,10 @@ import {
   approveCampaign,
   getCampaignById,
 } from "../../services/admin.service";
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 export default function CampaignList() {
   const [campaigns, setCampaigns] = useState([]);
@@ -75,7 +79,7 @@ export default function CampaignList() {
 
   if (loading) {
     return (
-       <AdminScreenWrapper>
+      <AdminScreenWrapper>
         <View style={styles.loadingWrapper}>
           <ActivityIndicator size="large" color="#6d28d9" />
           <Text style={styles.loadingText}>Cargando campañas...</Text>
@@ -85,167 +89,230 @@ export default function CampaignList() {
   }
 
   return (
-    <AdminScreenWrapper>
-      <Text style={styles.headerTitle}>📢 Campañas Pendientes</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f3ff" }}>
+      <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 40 }}>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {campaigns.length === 0 ? (
-          <Text style={styles.emptyText}>No hay campañas pendientes.</Text>
-        ) : (
-          campaigns.map((c) => (
-            <View key={c.id_campana} style={styles.card}>
-              {c.foto_principal && (
-                <Image
-                  source={{ uri: c.foto_principal }}
-                  style={styles.image}
-                />
-              )}
+        {/* Fondo con degradado */}
+        <LinearGradient
+          colors={["#f5f3ff", "#eff6ff", "#fbefff"]}
+          style={styles.backgroundGradient}
+        />
 
-              <Text style={styles.title}>{c.titulo}</Text>
+        {/* Título */}
+        <View style={{ paddingHorizontal: 20, marginTop: 10 }}>
+          <Text style={styles.headerTitle}>📢 Campañas Pendientes</Text>
+        </View>
 
-              <Text style={styles.description} numberOfLines={3}>
-                {c.descripcion}
-              </Text>
+        <View style={{ paddingHorizontal: 20 }}>
+          {campaigns.length === 0 ? (
+            <Text style={styles.emptyText}>No hay campañas pendientes.</Text>
+          ) : (
+            campaigns.map((c) => (
+              <View key={c.id_campana} style={styles.card}>
 
-              <Text style={styles.metaText}>
-                <Text style={styles.metaLabel}>Meta:</Text> ${c.monto_objetivo}{" "}
-                <Text style={styles.metaLabel}> | Duración:</Text>{" "}
-                {c.tiempo_objetivo} días
-              </Text>
+                {/* Imagen principal */}
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={{
+                      uri: c.foto1 || "https://via.placeholder.com/800x400?text=Sin+imagen",
+                    }}
+                    style={styles.image}
+                    resizeMode="cover"
+                  />
+                </View>
 
-              <Text style={styles.userText}>
-                Creado por{" "}
-                {c.usuario?.nombre
-                  ? `${c.usuario.nombre} ${c.usuario.apellido}`
-                  : `Usuario ${c.id_usuario}`}
-              </Text>
+                {/* Título */}
+                <Text style={styles.title}>{c.titulo}</Text>
 
-              <View style={styles.buttonsRow}>
-                <TouchableOpacity
-                  onPress={() => handleApprove(c.id_campana, true)}
-                  style={[styles.button, styles.approveButton]}
-                >
-                  <Text style={styles.buttonText}>✓ Aprobar</Text>
-                </TouchableOpacity>
+                {/* Descripción */}
+                <Text style={styles.description} numberOfLines={3}>
+                  {c.descripcion}
+                </Text>
 
-                <TouchableOpacity
-                  onPress={() => handleApprove(c.id_campana, false)}
-                  style={[styles.button, styles.rejectButton]}
-                >
-                  <Text style={styles.buttonText}>✕ Rechazar</Text>
-                </TouchableOpacity>
+                {/* Meta y duración */}
+                <View style={styles.statsRow}>
+                  <View style={styles.statBox}>
+                    <MaterialCommunityIcons name="target" size={18} color="#6d28d9" />
+                    <Text style={styles.statLabel}>Meta</Text>
+                    <Text style={styles.statValue}>
+                      ${Number(c.monto_objetivo).toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+                    </Text>
+                  </View>
+
+                  <View style={[styles.statBox, { backgroundColor: "#faf0ff" }]}>
+                    <MaterialCommunityIcons name="clock-outline" size={20} color="#6d28d9" />
+                    <Text style={styles.statLabelSmall}>Duración</Text>
+                    <Text style={styles.statValue}>
+                      {new Date(c.tiempo_objetivo).toLocaleDateString("es-AR")}{" "}
+                      {(() => {
+                        const diasRestantes = Math.ceil(
+                          (new Date(c.tiempo_objetivo) - new Date()) /
+                          (1000 * 60 * 60 * 24)
+                        );
+                        return diasRestantes > 0
+                          ? ` (faltan ${diasRestantes} ${diasRestantes === 1 ? "día" : "días"})`
+                          : diasRestantes === 0
+                            ? " (finaliza hoy)"
+                            : " (ya finalizó)";
+                      })()}
+
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Usuario */}
+                <Text style={styles.userText}>
+                  Creado por{" "}
+                  {c.usuario?.nombre
+                    ? `${c.usuario.nombre} ${c.usuario.apellido}`
+                    : `Usuario ${c.id_usuario}`}
+                </Text>
+
+                {/* Botones */}
+                <View style={styles.buttonsRow}>
+                  <TouchableOpacity
+                    onPress={() => handleApprove(c.id_campana, true)}
+                    style={[styles.actionBtn, { backgroundColor: "#2563eb" }]}
+                  >
+                    <Feather name="check" size={16} color="#fff" />
+                    <Text style={styles.actionText}>Aprobar</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => handleApprove(c.id_campana, false)}
+                    style={[styles.actionBtn, { backgroundColor: "#dc2626" }]}
+                  >
+                    <Feather name="x" size={16} color="#fff" />
+                    <Text style={styles.actionText}>Rechazar</Text>
+                  </TouchableOpacity>
+                </View>
+
               </View>
-            </View>
-          ))
-        )}
+            ))
+          )}
+        </View>
+
       </ScrollView>
-    </AdminScreenWrapper>
+    </SafeAreaView>
   );
+
 }
 
 const styles = StyleSheet.create({
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#6d28d9",
-    marginBottom: 20,
-    textAlign: "center",
+  screen: {
+    flex: 1,
+    backgroundColor: "#f5f3ff",
   },
 
-  loadingWrapper: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 40,
+  backgroundGradient: {
+    ...StyleSheet.absoluteFillObject,
   },
-  loadingText: {
-    marginTop: 10,
+
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "700",
     color: "#4c1d95",
+    marginBottom: 16,
   },
 
   emptyText: {
+    marginTop: 40,
     textAlign: "center",
-    paddingVertical: 40,
-    fontSize: 18,
+    fontSize: 16,
     color: "#6b7280",
   },
 
   card: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    backgroundColor: "rgba(255,255,255,0.96)",
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#e0e7ff",
     padding: 20,
     marginBottom: 24,
 
     shadowColor: "#8b5cf6",
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
     elevation: 5,
+  },
+
+  imageContainer: {
+    width: "100%",
+    height: 180,
+    borderRadius: 16,
+    overflow: "hidden",
+    marginBottom: 12,
   },
 
   image: {
     width: "100%",
-    height: 180,
-    borderRadius: 14,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#e0e7ff",
-    resizeMode: "cover",
+    height: "100%",
   },
 
   title: {
     fontSize: 20,
     fontWeight: "700",
+    color: "#1f2937",
     marginBottom: 8,
-    color: "#4c1d95",
   },
 
   description: {
+    fontSize: 15,
     color: "#4b5563",
     marginBottom: 12,
   },
 
-  metaText: {
-    color: "#4b5563",
-    fontSize: 15,
-    marginBottom: 6,
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
   },
-  metaLabel: {
-    color: "#6d28d9",
-    fontWeight: "700",
+
+  statBox: {
+    flex: 1,
+    backgroundColor: "#f3f0ff",
+    borderRadius: 14,
+    padding: 12,
+    marginHorizontal: 4,
+    alignItems: "center",
+  },
+
+  statLabel: {
+    fontSize: 12,
+    color: "#6b7280",
+    marginTop: 4,
+  },
+
+  statValue: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1f2937",
   },
 
   userText: {
-    color: "#6b7280",
-    fontSize: 15,
+    fontSize: 14,
+    color: "#4c1d95",
     marginBottom: 16,
-    fontWeight: "600",
+    marginTop: 8,
   },
 
   buttonsRow: {
     flexDirection: "row",
-    gap: 12,
+    justifyContent: "space-between",
+    marginTop: 12,
   },
 
-  button: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
+  actionBtn: {
+    flexDirection: "row",
     alignItems: "center",
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 12,
   },
 
-  approveButton: {
-    backgroundColor: "#22c55e",
-  },
-
-  rejectButton: {
-    backgroundColor: "#ef4444",
-  },
-
-  buttonText: {
-    color: "white",
-    fontWeight: "700",
-    fontSize: 16,
+  actionText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 15,
   },
 });

@@ -91,68 +91,78 @@ export default function UserList() {
   }
 
   return (
-    <AdminScreenWrapper>
-
+     <AdminScreenWrapper>
       <Text style={styles.title}>👥 Lista de Usuarios</Text>
 
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#7C3AED"
-          style={{ marginTop: 40 }}
-        />
+        <ActivityIndicator size="large" color="#7C3AED" style={{ marginTop: 40 }} />
       ) : users.length === 0 ? (
         <Text style={styles.noResults}>No se encontraron usuarios.</Text>
       ) : (
-        users.map((user) => {
-          const colors = getStatus(user.estado_cuenta);
+        users.map((user) => (
+          <View key={user.id_usuario} style={styles.card}>
+            <Text style={styles.name}>
+              {user.nombre} {user.apellido}
+            </Text>
 
-          return (
-            <View key={user.id_usuario} style={styles.card}>
-              <Text style={styles.name}>
-                {user.nombre} {user.apellido}
-              </Text>
+            <Text style={styles.email}>{user.email}</Text>
 
-              <Text style={styles.email}>{user.email}</Text>
-
-              <View
-                style={[
-                  styles.badge,
-                  { backgroundColor: colors.bg },
-                ]}
+            <View
+              style={[
+                styles.badge,
+                {
+                  backgroundColor:
+                    user.estado_cuenta === "habilitada"
+                      ? "#dcfce7"
+                      : user.estado_cuenta === "deshabilitada"
+                      ? "#fee2e2"
+                      : "#fef9c3",
+                },
+              ]}
+            >
+              <Text
+                style={{
+                  fontWeight: "700",
+                  color:
+                    user.estado_cuenta === "habilitada"
+                      ? "#15803d"
+                      : user.estado_cuenta === "deshabilitada"
+                      ? "#b91c1c"
+                      : "#a16207",
+                }}
               >
-                <Text style={{ color: colors.text, fontWeight: "600" }}>
-                  {user.estado_cuenta}
-                </Text>
-              </View>
-
-              <View style={styles.actions}>
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.greenButton]}
-                  onPress={() => handleStateChange(user.id_usuario, "habilitada")}
-                >
-                  <Text style={styles.actionButtonText}>✓ Habilitar</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.redButton]}
-                  onPress={() => handleStateChange(user.id_usuario, "deshabilitada")}
-                >
-                  <Text style={styles.actionButtonText}>✕ Deshabilitar</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.yellowButton]}
-                  onPress={() => handleStateChange(user.id_usuario, "suspendida")}
-                >
-                  <Text style={styles.actionButtonText}>⏸ Suspender</Text>
-                </TouchableOpacity>
-              </View>
-
-
+                {user.estado_cuenta}
+              </Text>
             </View>
-          );
-        })
+
+            {/* fila igual que AdminList */}
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                onPress={() => handleStateChange(user.id_usuario, "habilitada")}
+                style={[styles.button, styles.greenButton]}
+              >
+                <Text style={styles.buttonText}>✓ Habilitar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => handleStateChange(user.id_usuario, "deshabilitada")}
+                style={[styles.button, styles.redButton]}
+              >
+                <Text style={styles.buttonText}>🚫 Deshabilitar</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* botón extra abajo */}
+            <View style={{ marginTop: 10 }}>
+              <TouchableOpacity
+                onPress={() => handleStateChange(user.id_usuario, "suspendida")}
+                style={[styles.button, styles.yellowButton]}
+              >
+                <Text style={styles.buttonText}>⏸ Suspender</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))
       )}
     </AdminScreenWrapper>
   );
@@ -199,7 +209,6 @@ const styles = StyleSheet.create({
   email: {
     fontSize: 16,
     color: "#6d28d9",
-    marginBottom: 8,
   },
 
   badge: {
@@ -211,18 +220,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-actionButton: {
-  paddingVertical: 12,
-  borderRadius: 12,
-  alignItems: "center",
-  width: "31%",
-},
-actions: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  marginTop: 15,
-},
-  actionButtonText: {
+  buttonRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 15,
+    flexWrap: "wrap",
+  },
+
+  button: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    flexGrow: 1,
+  },
+
+  buttonText: {
     fontSize: 16,
     fontWeight: "600",
     color: "white",

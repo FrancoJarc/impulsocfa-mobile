@@ -144,114 +144,100 @@ export default function CategoryList() {
 
   return (
     <AdminScreenWrapper title="Categorías">
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 10 }}>
-        <LinearGradient
-          colors={["#fff0f5", "#ffe4e6"]}
-          style={styles.container}
-        >
-          {/* Header */}
-          <Text style={styles.header}>📂 Categorías</Text>
+      {/* Header */}
+      <Text style={styles.header}>📂 Categorías</Text>
 
-          {/* Crear categoría */}
-          <View style={styles.addRow}>
-            <TextInput
-              placeholder="Nueva categoría"
-              value={newCategory}
-              onChangeText={setNewCategory}
-              style={styles.newCategoryInput}
-            />
+      {/* Crear categoría */}
+      <View style={styles.addRow}>
+        <TextInput
+          placeholder="Nueva categoría"
+          value={newCategory}
+          onChangeText={setNewCategory}
+          style={styles.newCategoryInput}
+        />
 
-            <TouchableOpacity onPress={handleCreate}>
-              <LinearGradient
-                colors={["#ec4899", "#db2777"]}
-                style={styles.addButton}
-              >
-                <Text style={styles.addButtonText}>➕</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
+        <TouchableOpacity onPress={handleCreate} style={styles.addButton}>
+          <Text style={styles.addButtonText}>➕</Text>
+        </TouchableOpacity>
+      </View>
 
-          {/* Lista */}
-          {categories.length === 0 ? (
-            <Text style={styles.empty}>No hay categorías aún.</Text>
-          ) : (
-            categories.map((cat) => (
-              <LinearGradient
-                key={cat.id_categoria}
-                colors={["#ffe4e6", "#fff1f2"]}
-                style={styles.item}
-              >
-                {cat.isEditing ? (
-                  <View style={styles.editRow}>
-                    <TextInput
-                      value={cat.editName}
-                      onChangeText={(text) => {
-                        setCategories(
-                          categories.map((c) =>
-                            c.id_categoria === cat.id_categoria
-                              ? { ...c, editName: text }
-                              : c
-                          )
-                        );
-                      }}
-                      style={styles.editInput}
-                    />
-                    <TouchableOpacity onPress={() => handleSaveEdit(cat)}>
-                      <View style={styles.confirmButton}>
-                        <Text style={styles.confirmText}>✓</Text>
-                      </View>
-                    </TouchableOpacity>
+      {/* Lista */}
+      {categories.length === 0 ? (
+        <Text style={styles.empty}>No hay categorías aún.</Text>
+      ) : (
+        categories.map((cat) => (
+          <View key={cat.id_categoria} style={styles.item}>
+            {cat.isEditing ? (
+              <View style={styles.editRow}>
+                <TextInput
+                  value={cat.editName}
+                  onChangeText={(text) => {
+                    setCategories(
+                      categories.map((c) =>
+                        c.id_categoria === cat.id_categoria
+                          ? { ...c, editName: text }
+                          : c
+                      )
+                    );
+                  }}
+                  style={styles.editInput}
+                />
 
-                    <TouchableOpacity
-                      onPress={() =>
-                        setCategories(
-                          categories.map((c) =>
-                            c.id_categoria === cat.id_categoria
-                              ? { ...c, isEditing: false, editName: c.nombre }
-                              : c
-                          )
-                        )
-                      }
-                    >
-                      <View style={styles.cancelButton}>
-                        <Text style={styles.cancelText}>✕</Text>
-                      </View>
-                    </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleSaveEdit(cat)}>
+                  <View style={styles.confirmButton}>
+                    <Text style={styles.confirmText}>✓</Text>
                   </View>
-                ) : (
-                  <>
-                    <Text style={styles.itemName}>{cat.nombre}</Text>
+                </TouchableOpacity>
 
-                    <View style={styles.itemActions}>
-                      <TouchableOpacity
-                        onPress={() =>
-                          setCategories(
-                            categories.map((c) =>
-                              c.id_categoria === cat.id_categoria
-                                ? { ...c, isEditing: true }
-                                : c
-                            )
-                          )
-                        }
-                      >
-                        <Text style={styles.editIcon}>✏️</Text>
-                      </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    setCategories(
+                      categories.map((c) =>
+                        c.id_categoria === cat.id_categoria
+                          ? { ...c, isEditing: false, editName: c.nombre }
+                          : c
+                      )
+                    )
+                  }
+                >
+                  <View style={styles.cancelButton}>
+                    <Text style={styles.cancelText}>✕</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <>
+                <Text style={styles.itemName}>{cat.nombre}</Text>
 
-                      <TouchableOpacity
-                        onPress={() => confirmDelete(cat.id_categoria)}
-                      >
-                        <Text style={styles.deleteIcon}>🗑️</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </>
-                )}
-              </LinearGradient>
-            ))
-          )}
-        </LinearGradient>
-      </ScrollView>
+                <View style={styles.itemActions}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      setCategories(
+                        categories.map((c) =>
+                          c.id_categoria === cat.id_categoria
+                            ? { ...c, isEditing: true }
+                            : c
+                        )
+                      )
+                    }
+                  >
+                    <Text style={styles.editIcon}>✏️</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => confirmDelete(cat.id_categoria)}
+                  >
+                    <Text style={styles.deleteIcon}>🗑️</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </View>
+        ))
+      )}
     </AdminScreenWrapper>
   );
+
 }
 
 const styles = StyleSheet.create({
@@ -260,15 +246,17 @@ const styles = StyleSheet.create({
     padding: 24,
   },
 
+  // ⬇️ Contenedor principal: solo un marco blanco, sin borde rosa
   container: {
     borderRadius: 20,
     padding: 24,
-    borderWidth: 2,
-    borderColor: "#fbcfe8",
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#e5e7eb", // gris suave
     shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
   },
 
   header: {
@@ -287,8 +275,8 @@ const styles = StyleSheet.create({
 
   newCategoryInput: {
     flex: 1,
-    borderWidth: 2,
-    borderColor: "#f9a8d4",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
     padding: 12,
     borderRadius: 12,
     backgroundColor: "white",
@@ -311,17 +299,22 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
 
+  // ⬇️ Ítems sin bordes de color, estilo más limpio
   item: {
     width: "100%",
     paddingVertical: 18,
     paddingHorizontal: 20,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: "#fbcfe8",
+    borderRadius: 14,
+    backgroundColor: "#fff",
     marginBottom: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
 
   itemName: {
@@ -356,8 +349,8 @@ const styles = StyleSheet.create({
   editInput: {
     flex: 1,
     backgroundColor: "white",
-    borderWidth: 2,
-    borderColor: "#f9a8d4",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
     padding: 10,
     borderRadius: 12,
   },
@@ -368,6 +361,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 10,
   },
+
   confirmText: {
     color: "white",
     fontWeight: "600",
@@ -379,6 +373,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 10,
   },
+
   cancelText: {
     color: "white",
     fontWeight: "600",
