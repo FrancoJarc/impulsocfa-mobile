@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert,  StyleSheet,} from "react-native";
 import { getAdmins, disableAdmin, updateAdmin } from "../../services/admin.service";
 import Toast from "react-native-toast-message";
-
+import AdminScreenWrapper from "./AdminScreenWrapper";
 
 export default function AdminList() {
   const [admins, setAdmins] = useState([]);
@@ -87,7 +87,7 @@ export default function AdminList() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <AdminScreenWrapper>
       <Text style={styles.title}>👤 Lista de Administradores</Text>
 
       {admins.length === 0 ? (
@@ -165,23 +165,17 @@ export default function AdminList() {
           </View>
         ))
       )}
-    </ScrollView>
+    </AdminScreenWrapper>
   );
 }
 
-
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#F8F5FF",
-    padding: 16,
-  },
-
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    color: "#6d28d9",
-    marginBottom: 20,
     textAlign: "center",
+    marginBottom: 25,
+    color: "#6d28d9",
   },
 
   noAdmins: {
@@ -192,17 +186,19 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "white",
-    padding: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    padding: 18,
     borderRadius: 16,
-    marginBottom: 16,
-    shadowColor: "#8b5cf6",
-    shadowOpacity: 0.12,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 6,
-    elevation: 3,
+    marginBottom: 20,
+
     borderWidth: 1,
     borderColor: "#e0e7ff",
+
+    shadowColor: "#8b5cf6",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    elevation: 4,
   },
 
   infoContainer: {
@@ -211,46 +207,49 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1f2937",
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#4c1d95",
   },
 
   email: {
-    fontSize: 15,
-    color: "#6b7280",
+    fontSize: 16,
+    color: "#6d28d9",
   },
 
   input: {
     backgroundColor: "#f5f3ff",
     borderWidth: 1,
     borderColor: "#dcd4ff",
-    borderRadius: 10,
-    padding: 10,
+    borderRadius: 12,
+    padding: 12,
     color: "#4c1d95",
+    fontSize: 16,
   },
 
   buttonRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: 10,
-    marginTop: 10,
+    marginTop: 15,
+    flexWrap: "wrap",
   },
 
   button: {
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 14,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: "center",
+    flexGrow: 1,
   },
 
   buttonText: {
+    fontSize: 16,
+    fontWeight: "600",
     color: "white",
-    fontWeight: "bold",
   },
 
   editButton: {
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#7c3aed",
   },
 
   disableButton: {
@@ -266,7 +265,8 @@ const styles = StyleSheet.create({
   },
 
   cancelText: {
-    color: "#374151",
+    fontSize: 16,
     fontWeight: "600",
+    color: "#374151",
   },
 });

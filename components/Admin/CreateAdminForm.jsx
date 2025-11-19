@@ -4,13 +4,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { createAdmin } from "../../services/admin.service";
 import CountryPicker from "react-native-country-picker-modal";
+import AdminScreenWrapper from "./AdminScreenWrapper";
 
 export default function CreateAdminForm() {
   const [formData, setFormData] = useState({
@@ -24,17 +24,18 @@ export default function CreateAdminForm() {
   const [loading, setLoading] = useState(false);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
 
-
   function handleChange(name, value) {
     setFormData({ ...formData, [name]: value });
   }
 
   async function handleSubmit() {
-    if (!formData.nombre.trim() ||
+    if (
+      !formData.nombre.trim() ||
       !formData.apellido.trim() ||
       !formData.email.trim() ||
       !formData.password.trim() ||
-      !formData.nacionalidad.trim()) {
+      !formData.nacionalidad.trim()
+    ) {
       Toast.show({
         type: "error",
         text1: "Campos incompletos",
@@ -60,7 +61,6 @@ export default function CreateAdminForm() {
         password: "",
         nacionalidad: "",
       });
-
     } catch (error) {
       Toast.show({
         type: "error",
@@ -73,12 +73,14 @@ export default function CreateAdminForm() {
   }
 
   return (
-   <ScrollView style={styles.container}>
+    <AdminScreenWrapper title="Crear Administrador">
       <View style={styles.card}>
-        <Text style={styles.title}>➕ Crear Administrador</Text>
+        <Text style={styles.title}>➕ Nuevo Administrador</Text>
 
-        {/* Inputs */}
         <View style={styles.inputsWrapper}>
+
+          {/* Nombre */}
+          <Text style={styles.label}>Nombre</Text>
           <TextInput
             placeholder="Nombre"
             value={formData.nombre}
@@ -86,6 +88,8 @@ export default function CreateAdminForm() {
             style={styles.input}
           />
 
+          {/* Apellido */}
+          <Text style={styles.label}>Apellido</Text>
           <TextInput
             placeholder="Apellido"
             value={formData.apellido}
@@ -93,6 +97,8 @@ export default function CreateAdminForm() {
             style={styles.input}
           />
 
+          {/* Email */}
+          <Text style={styles.label}>Correo electrónico</Text>
           <TextInput
             placeholder="Correo electrónico"
             value={formData.email}
@@ -101,6 +107,8 @@ export default function CreateAdminForm() {
             style={styles.input}
           />
 
+          {/* Password */}
+          <Text style={styles.label}>Contraseña</Text>
           <TextInput
             placeholder="Contraseña"
             secureTextEntry
@@ -109,9 +117,8 @@ export default function CreateAdminForm() {
             style={styles.input}
           />
 
-    {/* Nacionalidad */}
+          {/* Nacionalidad */}
           <Text style={styles.label}>Nacionalidad</Text>
-
           <TouchableOpacity
             style={styles.countryButton}
             onPress={() => setShowCountryPicker(true)}
@@ -126,7 +133,6 @@ export default function CreateAdminForm() {
             withFilter
             withFlag
             withAlphaFilter
-            withCountryNameButton={false}
             renderFlagButton={() => null}
             onSelect={(country) => {
               handleChange("nacionalidad", country.name);
@@ -136,7 +142,6 @@ export default function CreateAdminForm() {
           />
         </View>
 
-        {/* Botón */}
         <TouchableOpacity
           disabled={loading}
           onPress={handleSubmit}
@@ -150,35 +155,17 @@ export default function CreateAdminForm() {
           )}
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </AdminScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#F3E8FF", // bg-violet-50
-  },
-
-  card: {
-    backgroundColor: "rgba(255,255,255,0.8)",
-    padding: 24,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#E9D5FF", // border-violet-200
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
-  },
-
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "bold",
-    color: "#6D28D9", // violet-700
+    color: "#6D28D9",
     marginBottom: 24,
+    textAlign: "center",
   },
 
   inputsWrapper: {
@@ -188,21 +175,36 @@ const styles = StyleSheet.create({
 
   input: {
     borderWidth: 2,
-    borderColor: "#E9D5FF", // border-violet-200
+    borderColor: "#E9D5FF",
     backgroundColor: "#fff",
     padding: 12,
     borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+  },
+
+  label: {
+    fontWeight: "600",
+    marginBottom: -4,
+    color: "#6D28D9",
+    marginTop: 4,
+  },
+
+  countryButton: {
+    borderWidth: 2,
+    borderColor: "#E9D5FF",
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 12,
+  },
+
+  countryText: {
+    color: "#4B5563",
   },
 
   button: {
     width: "100%",
     paddingVertical: 14,
     borderRadius: 12,
-    backgroundColor: "#A855F7", // fallback for gradient
+    backgroundColor: "#A855F7",
     elevation: 3,
   },
 

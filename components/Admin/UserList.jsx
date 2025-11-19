@@ -9,14 +9,12 @@ import {
   StyleSheet,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import { Search } from "lucide-react-native";
 import { getUsers, changeUserState } from "../../services/admin.service";
+import AdminScreenWrapper from "./AdminScreenWrapper";
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
-  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
 
   // Cargar usuarios
   useEffect(() => {
@@ -28,7 +26,6 @@ export default function UserList() {
       setLoading(true);
       const data = await getUsers();
       setUsers(data);
-      setFiltered(data);
     } catch (error) {
       Toast.show({
         type: "error",
@@ -94,172 +91,165 @@ export default function UserList() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>👥 Usuarios Registrados</Text>
+     <AdminScreenWrapper>
+      <Text style={styles.title}>👥 Lista de Usuarios</Text>
 
-      {/* BUSCADOR */}
-      <View style={styles.searchWrapper}>
-        <Search size={20} color="#7C3AED" style={styles.searchIcon} />
-        <TextInput
-          placeholder="Buscar por nombre, apellido o email..."
-          value={search}
-          onChangeText={handleSearch}
-          style={styles.searchInput}
-        />
-      </View>
-
-      {/* LOADING */}
       {loading ? (
         <ActivityIndicator size="large" color="#7C3AED" style={{ marginTop: 40 }} />
-      ) : filtered.length === 0 ? (
+      ) : users.length === 0 ? (
         <Text style={styles.noResults}>No se encontraron usuarios.</Text>
       ) : (
-        filtered.map((user) => {
-          const colors = getStatus(user.estado_cuenta);
+        users.map((user) => (
+          <View key={user.id_usuario} style={styles.card}>
+            <Text style={styles.name}>
+              {user.nombre} {user.apellido}
+            </Text>
 
-          return (
-            <View key={user.id_usuario} style={styles.card}>
-              <Text style={styles.name}>
-                {user.nombre} {user.apellido}
-              </Text>
+            <Text style={styles.email}>{user.email}</Text>
 
-              <Text style={styles.email}>{user.email}</Text>
-
-              {/* BADGE */}
-              <View
-                style={[
-                  styles.badge,
-                  { backgroundColor: colors.bg },
-                ]}
+            <View
+              style={[
+                styles.badge,
+                {
+                  backgroundColor:
+                    user.estado_cuenta === "habilitada"
+                      ? "#dcfce7"
+                      : user.estado_cuenta === "deshabilitada"
+                      ? "#fee2e2"
+                      : "#fef9c3",
+                },
+              ]}
+            >
+              <Text
+                style={{
+                  fontWeight: "700",
+                  color:
+                    user.estado_cuenta === "habilitada"
+                      ? "#15803d"
+                      : user.estado_cuenta === "deshabilitada"
+                      ? "#b91c1c"
+                      : "#a16207",
+                }}
               >
-                <Text style={{ color: colors.text, fontWeight: "600" }}>
-                  {user.estado_cuenta}
-                </Text>
-              </View>
-
-              {/* BOTONES */}
-              <View style={styles.actions}>
-                <TouchableOpacity
-                  onPress={() => handleStateChange(user.id_usuario, "habilitada")}
-                >
-                  <Text style={[styles.actionText, { color: "#16A34A" }]}>
-                    ✓ Habilitar
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => handleStateChange(user.id_usuario, "deshabilitada")}
-                >
-                  <Text style={[styles.actionText, { color: "#DC2626" }]}>
-                    ✕ Deshabilitar
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => handleStateChange(user.id_usuario, "suspendida")}
-                >
-                  <Text style={[styles.actionText, { color: "#CA8A04" }]}>
-                    ⏸ Suspender
-                  </Text>
-                </TouchableOpacity>
-              </View>
+                {user.estado_cuenta}
+              </Text>
             </View>
-          );
-        })
+
+            {/* fila igual que AdminList */}
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                onPress={() => handleStateChange(user.id_usuario, "habilitada")}
+                style={[styles.button, styles.greenButton]}
+              >
+                <Text style={styles.buttonText}>✓ Habilitar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => handleStateChange(user.id_usuario, "deshabilitada")}
+                style={[styles.button, styles.redButton]}
+              >
+                <Text style={styles.buttonText}>🚫 Deshabilitar</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* botón extra abajo */}
+            <View style={{ marginTop: 10 }}>
+              <TouchableOpacity
+                onPress={() => handleStateChange(user.id_usuario, "suspendida")}
+                style={[styles.button, styles.yellowButton]}
+              >
+                <Text style={styles.buttonText}>⏸ Suspender</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))
       )}
-    </ScrollView>
+    </AdminScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#F3E8FF",
-  },
-
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "bold",
-    color: "#6D28D9",
     textAlign: "center",
-    marginBottom: 16,
-  },
-
-  searchWrapper: {
-    position: "relative",
-    marginBottom: 16,
-  },
-
-  searchIcon: {
-    position: "absolute",
-    top: 14,
-    left: 12,
-  },
-
-  searchInput: {
-    backgroundColor: "#fff",
-    borderWidth: 2,
-    borderColor: "#E9D5FF",
-    padding: 12,
-    paddingLeft: 40,
-    borderRadius: 12,
-    fontSize: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    marginBottom: 25,
+    color: "#6d28d9",
   },
 
   noResults: {
     textAlign: "center",
-    marginTop: 30,
-    color: "#6B7280",
     fontSize: 16,
+    color: "#6b7280",
+    marginTop: 40,
   },
 
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
     padding: 18,
-    borderRadius: 20,
-    marginBottom: 14,
+    borderRadius: 16,
+    marginBottom: 20,
+
     borderWidth: 1,
-    borderColor: "#E9D5FF",
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
+    borderColor: "#e0e7ff",
+
+    shadowColor: "#8b5cf6",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 4 },
     shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
+    elevation: 4,
   },
 
   name: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#1F2937",
+    color: "#4c1d95",
   },
 
   email: {
-    color: "#6B7280",
-    marginBottom: 6,
+    fontSize: 16,
+    color: "#6d28d9",
   },
 
   badge: {
     alignSelf: "flex-start",
-    paddingVertical: 4,
-    paddingHorizontal: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 14,
     borderRadius: 999,
+    marginTop: 6,
     marginBottom: 10,
   },
 
-  actions: {
+  buttonRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 6,
+    gap: 10,
+    marginTop: 15,
+    flexWrap: "wrap",
   },
 
-  actionText: {
-    fontWeight: "700",
-    textDecorationLine: "underline",
-    fontSize: 15,
+  button: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    flexGrow: 1,
+  },
+
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
+  },
+
+  greenButton: {
+    backgroundColor: "#22c55e",
+  },
+
+  redButton: {
+    backgroundColor: "#ef4444",
+  },
+
+  yellowButton: {
+    backgroundColor: "#eab308",
   },
 });

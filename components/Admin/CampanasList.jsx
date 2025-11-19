@@ -8,14 +8,19 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+
 import Toast from "react-native-toast-message";
+import AdminScreenWrapper from "./AdminScreenWrapper";
 
 import {
   getPendingCampaigns,
   approveCampaign,
   getCampaignById,
 } from "../../services/admin.service";
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 export default function CampaignList() {
   const [campaigns, setCampaigns] = useState([]);
@@ -34,12 +39,6 @@ export default function CampaignList() {
       );
 
       setCampaigns(detailed);
-
-      Toast.show({
-        type: "success",
-        text1: "Campañas cargadas",
-        text2: "Pendientes cargadas correctamente",
-      });
     } catch (error) {
       console.error(error);
       Toast.show({
@@ -74,182 +73,232 @@ export default function CampaignList() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#7c3aed" />
-        <Text style={styles.loadingText}>Cargando campañas...</Text>
-      </View>
+      <AdminScreenWrapper>
+        <View style={styles.loadingWrapper}>
+          <ActivityIndicator size="large" color="#6d28d9" />
+          <Text style={styles.loadingText}>Cargando campañas...</Text>
+        </View>
+      </AdminScreenWrapper>
     );
   }
 
   return (
-   <LinearGradient
-      colors={["#f5f3ff", "#eff6ff", "#f3e8ff"]}
-      style={styles.container}
-    >
-      <Text style={styles.headerTitle}>📢 Campañas Pendientes</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f5f3ff" }}>
+      <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 40 }}>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {campaigns.length === 0 ? (
-          <Text style={styles.emptyText}>No hay campañas pendientes.</Text>
-        ) : (
-          campaigns.map((c) => (
-            <View key={c.id_campana} style={styles.card}>
-              {c.foto_principal && (
-                <Image
-                  source={{ uri: c.foto_principal }}
-                  style={styles.image}
-                />
-              )}
+        {/* Fondo con degradado */}
+        <LinearGradient
+          colors={["#f5f3ff", "#eff6ff", "#fbefff"]}
+          style={styles.backgroundGradient}
+        />
 
-              <Text style={styles.title}>{c.titulo}</Text>
+        {/* Título */}
+        <View style={{ paddingHorizontal: 20, marginTop: 25 }}>
+          <Text style={styles.headerTitle}>📢 Campañas Pendientes</Text>
+        </View>
 
-              <Text style={styles.description} numberOfLines={3}>
-                {c.descripcion}
-              </Text>
+        <View style={{ paddingHorizontal: 20 }}>
+          {campaigns.length === 0 ? (
+            <Text style={styles.emptyText}>No hay campañas pendientes.</Text>
+          ) : (
+            campaigns.map((c) => (
+              <View key={c.id_campana} style={styles.card}>
 
-              <Text style={styles.metaText}>
-                <Text style={styles.metaLabel}>Meta:</Text> ${c.monto_objetivo}{" "}
-                <Text style={styles.metaLabel}> | Duración:</Text>{" "}
-                {c.tiempo_objetivo} días
-              </Text>
+                {/* Imagen principal */}
+                <View style={styles.imageContainer}>
+                  <Image
+                    source={{
+                      uri: c.foto1 || "https://via.placeholder.com/800x400?text=Sin+imagen",
+                    }}
+                    style={styles.image}
+                    resizeMode="cover"
+                  />
+                </View>
 
-              <Text style={styles.userText}>
-                Usuario:{" "}
-                {c.usuario?.nombre
-                  ? `${c.usuario.nombre} ${c.usuario.apellido}`
-                  : c.id_usuario}
-              </Text>
+                {/* Título */}
+                <Text style={styles.title}>{c.titulo}</Text>
 
-              <View style={styles.buttonsRow}>
-                <TouchableOpacity
-                  onPress={() => handleApprove(c.id_campana, true)}
-                  style={{ flex: 1 }}
-                >
-                  <LinearGradient
-                    colors={["#4ade80", "#10b981"]}
-                    style={styles.button}
+                {/* Descripción */}
+                <Text style={styles.description} numberOfLines={3}>
+                  {c.descripcion}
+                </Text>
+
+                {/* Meta y duración */}
+                <View style={styles.statsRow}>
+                  <View style={styles.statBox}>
+                    <MaterialCommunityIcons name="target" size={18} color="#6d28d9" />
+                    <Text style={styles.statLabel}>Meta</Text>
+                    <Text style={styles.statValue}>
+                      ${Number(c.monto_objetivo).toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+                    </Text>
+                  </View>
+
+                  <View style={[styles.statBox, { backgroundColor: "#faf0ff" }]}>
+                    <MaterialCommunityIcons name="clock-outline" size={20} color="#6d28d9" />
+                    <Text style={styles.statLabelSmall}>Duración</Text>
+                    <Text style={styles.statValue}>
+                      {new Date(c.tiempo_objetivo).toLocaleDateString("es-AR")}{" "}
+                      {(() => {
+                        const diasRestantes = Math.ceil(
+                          (new Date(c.tiempo_objetivo) - new Date()) /
+                          (1000 * 60 * 60 * 24)
+                        );
+                        return diasRestantes > 0
+                          ? ` (faltan ${diasRestantes} ${diasRestantes === 1 ? "día" : "días"})`
+                          : diasRestantes === 0
+                            ? " (finaliza hoy)"
+                            : " (ya finalizó)";
+                      })()}
+
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Botones */}
+                <View style={styles.buttonsRow}>
+                  <TouchableOpacity
+                    onPress={() => handleApprove(c.id_campana, true)}
+                    style={[styles.actionBtn, { backgroundColor: "#2563eb" }]}
                   >
-                    <Text style={styles.buttonText}>✓ Aprobar</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
+                    <Feather name="check" size={16} color="#fff" />
+                    <Text style={styles.actionText}>Aprobar</Text>
+                  </TouchableOpacity>
 
-                <TouchableOpacity
-                  onPress={() => handleApprove(c.id_campana, false)}
-                  style={{ flex: 1 }}
-                >
-                  <LinearGradient
-                    colors={["#f87171", "#ec4899"]}
-                    style={styles.button}
+                  <TouchableOpacity
+                    onPress={() => handleApprove(c.id_campana, false)}
+                    style={[styles.actionBtn, { backgroundColor: "#dc2626" }]}
                   >
-                    <Text style={styles.buttonText}>✕ Rechazar</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
+                    <Feather name="x" size={16} color="#fff" />
+                    <Text style={styles.actionText}>Rechazar</Text>
+                  </TouchableOpacity>
+                </View>
+
               </View>
-            </View>
-          ))
-        )}
+            ))
+          )}
+        </View>
+
       </ScrollView>
-    </LinearGradient>
+    </SafeAreaView>
   );
+
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    padding: 20,
-  },
-
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#f5f3ff",
   },
-  loadingText: {
-    marginTop: 10,
-    color: "#4b5563",
+
+  backgroundGradient: {
+    ...StyleSheet.absoluteFillObject,
   },
 
   headerTitle: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#6d28d9",
-    marginBottom: 20,
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#4c1d95",
+    marginBottom: 16,
   },
 
   emptyText: {
+    marginTop: 40,
     textAlign: "center",
-    paddingVertical: 40,
-    fontSize: 18,
+    fontSize: 16,
     color: "#6b7280",
   },
 
   card: {
-    backgroundColor: "rgba(255,255,255,0.8)",
+    backgroundColor: "rgba(255,255,255,0.96)",
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#ddd6fe",
     padding: 20,
     marginBottom: 24,
 
-    shadowColor: "#000",
+    shadowColor: "#8b5cf6",
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
     elevation: 5,
+  },
+
+  imageContainer: {
+    width: "100%",
+    height: 180,
+    borderRadius: 16,
+    overflow: "hidden",
+    marginBottom: 12,
   },
 
   image: {
     width: "100%",
-    height: 180,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    resizeMode: "cover",
+    height: "100%",
   },
 
   title: {
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "700",
+    color: "#1f2937",
     marginBottom: 8,
   },
 
   description: {
-    color: "#334155",
+    fontSize: 15,
+    color: "#4b5563",
     marginBottom: 12,
   },
 
-  metaText: {
-    color: "#475569",
-    fontSize: 14,
-    marginBottom: 4,
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
   },
-  metaLabel: {
-    color: "#7c3aed",
+
+  statBox: {
+    flex: 1,
+    backgroundColor: "#f3f0ff",
+    borderRadius: 14,
+    padding: 12,
+    marginHorizontal: 4,
+    alignItems: "center",
+  },
+
+  statLabel: {
+    fontSize: 12,
+    color: "#6b7280",
+    marginTop: 4,
+  },
+
+  statValue: {
+    fontSize: 14,
     fontWeight: "600",
+    color: "#1f2937",
   },
 
   userText: {
-    color: "#6b7280",
     fontSize: 14,
-    fontWeight: "600",
+    color: "#4c1d95",
     marginBottom: 16,
+    marginTop: 8,
   },
 
   buttonsRow: {
     flexDirection: "row",
-    gap: 12,
+    justifyContent: "space-between",
+    marginTop: 12,
   },
 
-  button: {
-    padding: 12,
-    borderRadius: 10,
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 12,
   },
 
-  buttonText: {
-    color: "white",
-    textAlign: "center",
+  actionText: {
+    color: "#fff",
     fontWeight: "600",
+    fontSize: 15,
   },
 });
