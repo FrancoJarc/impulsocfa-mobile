@@ -122,10 +122,6 @@ export default function VerMasHist() {
               <Text style={styles.likeButtonText}>Me encanta esta historia</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.shareButton}>
-              <Share2 size={20} color="#7c3aed" />
-              <Text style={styles.shareButtonText}>Compartir</Text>
-            </TouchableOpacity>
           </View>
 
           {/* Volver */}

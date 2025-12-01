@@ -80,7 +80,9 @@ export default function HistoriasScreen() {
             <Text style={styles.primaryBtnText}>Leer Historias</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.secondaryBtn}>
+          <TouchableOpacity style={styles.secondaryBtn}
+          onPress={() => router.push("/(tabs)/historias/FormHist")}
+          >
             <Feather name="share-2" size={20} color="#8B5CF6" />
             <Text style={styles.secondaryBtnText}>Compartir mi Historia</Text>
           </TouchableOpacity>

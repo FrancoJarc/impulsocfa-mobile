@@ -130,7 +130,7 @@ export default function LeerHist() {
       {/* Button: Subir Historia */}
       <Animated.View entering={FadeInUp.delay(400)} style={styles.buttonWrapper}>
         <TouchableOpacity
-          onPress={() => router.push("/Historias/FormHist")}
+          onPress={() => router.push("/historias/FormHist")}
           style={styles.bigButton}
         >
           <Text style={styles.bigButtonText}>Subí tu Historia</Text>
