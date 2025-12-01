@@ -131,7 +131,7 @@ export default function VerMasHist() {
           {/* Volver */}
           <TouchableOpacity
             style={styles.backBottom}
-            onPress={() => router.push("/Historias")}
+            onPress={() => router.push("/historias/LeerHist")}
           >
             <ArrowLeft color="#7c3aed" size={20} />
             <Text style={styles.backBottomText}>Volver a todas las historias</Text>
