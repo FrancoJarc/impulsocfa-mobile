@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { createAdmin } from "../../services/admin.service";
-import CountryPicker from "react-native-country-picker-modal";
 import AdminScreenWrapper from "./AdminScreenWrapper";
 
 export default function CreateAdminForm() {
@@ -18,11 +17,9 @@ export default function CreateAdminForm() {
     apellido: "",
     email: "",
     password: "",
-    nacionalidad: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [showCountryPicker, setShowCountryPicker] = useState(false);
 
   function handleChange(name, value) {
     setFormData({ ...formData, [name]: value });
@@ -33,8 +30,7 @@ export default function CreateAdminForm() {
       !formData.nombre.trim() ||
       !formData.apellido.trim() ||
       !formData.email.trim() ||
-      !formData.password.trim() ||
-      !formData.nacionalidad.trim()
+      !formData.password.trim()
     ) {
       Toast.show({
         type: "error",
@@ -51,15 +47,15 @@ export default function CreateAdminForm() {
       Toast.show({
         type: "success",
         text1: "Administrador creado",
-        text2: "El administrador fue registrado exitosamente.",
+        text2: "Accede a tu email para confirmar la cuenta.",
       });
 
+      // Reset form
       setFormData({
         nombre: "",
         apellido: "",
         email: "",
         password: "",
-        nacionalidad: "",
       });
     } catch (error) {
       Toast.show({
@@ -120,30 +116,6 @@ export default function CreateAdminForm() {
             onChangeText={(t) => handleChange("password", t)}
             style={styles.input}
           />
-
-          {/* Nacionalidad */}
-          <Text style={styles.label}>Nacionalidad</Text>
-          <TouchableOpacity
-            style={styles.countryButton}
-            onPress={() => setShowCountryPicker(true)}
-          >
-            <Text style={styles.countryText}>
-              {formData.nacionalidad || "Selecciona tu país"}
-            </Text>
-          </TouchableOpacity>
-
-          <CountryPicker
-            visible={showCountryPicker}
-            withFilter
-            withFlag
-            withAlphaFilter
-            renderFlagButton={() => null}
-            onSelect={(country) => {
-              handleChange("nacionalidad", country.name);
-              setShowCountryPicker(false);
-            }}
-            onClose={() => setShowCountryPicker(false)}
-          />
         </View>
 
         <TouchableOpacity
@@ -190,18 +162,6 @@ const styles = StyleSheet.create({
     marginBottom: -4,
     color: "#6D28D9",
     marginTop: 4,
-  },
-
-  countryButton: {
-    borderWidth: 2,
-    borderColor: "#E9D5FF",
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 12,
-  },
-
-  countryText: {
-    color: "#4B5563",
   },
 
   button: {

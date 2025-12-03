@@ -40,8 +40,12 @@ export async function createAdmin(adminData) {
     body: JSON.stringify(adminData),
   });
 
-  if (!res.ok) throw new Error("Error al crear el administrador");
-  return await res.json();
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Error desconocido");
+  }
+
+  return data;
 }
 
 // Actualizar administrador

@@ -10,7 +10,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import Toast from "react-native-toast-message";
 import AdminScreenWrapper from "./AdminScreenWrapper";
-
+import { Alert } from "react-native";
 import {
   getCategories,
   createCategory,
@@ -69,29 +69,23 @@ export default function CategoryList() {
     }
   }
 
+
   function confirmDelete(id) {
-    Toast.show({
-      type: "info",
-      text1: "¿Eliminar categoría?",
-      text2: "Esta acción no se puede deshacer.",
-      autoHide: false,
-      props: {
-        buttons: [
-          {
-            text: "Cancelar",
-            onPress: () => Toast.hide(),
-            bg: "#e5e7eb",
-            color: "#111827",
-          },
-          {
-            text: "Eliminar",
-            onPress: () => handleDelete(id),
-            bg: "#ef4444",
-            color: "white",
-          },
-        ],
-      },
-    });
+    Alert.alert(
+      "¿Eliminar categoría?",
+      "Esta acción no se puede deshacer.",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => handleDelete(id),
+        },
+      ]
+    );
   }
 
   async function handleDelete(id) {
