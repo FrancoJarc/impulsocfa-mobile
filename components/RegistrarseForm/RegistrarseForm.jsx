@@ -1,8 +1,8 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { ActivityIndicator, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import CountryPicker from "react-native-country-picker-modal";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import Toast from 'react-native-toast-message';
 import { registerUser } from "../../services/auth.service";
 
@@ -239,6 +239,7 @@ const styles = StyleSheet.create({
     },
     input: {
         backgroundColor: "#ede9fe",
+        color: "#374151",
         borderColor: "#c4b5fd",
         borderWidth: 1,
         borderRadius: 10,
@@ -264,7 +265,7 @@ const styles = StyleSheet.create({
         padding: 12,
     },
     countryText: {
-        color: "#1e1e2f",
+        color: "#374151",
     },
     imagePicker: {
         backgroundColor: "#ede9fe",
