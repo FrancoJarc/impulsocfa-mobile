@@ -77,17 +77,7 @@ export default function LeerHist() {
                   {story.contenido?.slice(0, 140)}...
                 </Text>
 
-                {/* Autor */}
-                <View style={styles.authorRow}>
-                  <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
-                      {(story.nombre_autor?.charAt(0) || "?").toUpperCase()}
-                    </Text>
-                  </View>
-                  <Text style={styles.authorName}>
-                    {story.nombre_autor || "Anónimo"}
-                  </Text>
-                </View>
+
 
                 {/* Footer */}
                 <View style={styles.footer}>
@@ -107,7 +97,10 @@ export default function LeerHist() {
 
                   <TouchableOpacity
                     onPress={() =>
-                      router.push(`/historias/VerMasHist/${story.id_historia}`)
+                      router.push({
+                        pathname: "/historias/VerMasHist",
+                        params: { id: story.id_historia },
+                      })
                     }
                     style={styles.nextButton}
                   >

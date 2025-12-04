@@ -20,12 +20,12 @@ import { createPreference } from "../../services/payment.service"; // debe devol
 
 export default function DetalleCampana() {
     const router = useRouter();
-    const params = useLocalSearchParams(); 
+    const params = useLocalSearchParams();
     const id = params.id || params?.[0];
     const [campana, setCampana] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [amount, setAmount] = useState(""); 
+    const [amount, setAmount] = useState("");
     const [llaveMaestra, setLlaveMaestra] = useState("");
     const [preferenceId, setPreferenceId] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -126,7 +126,7 @@ export default function DetalleCampana() {
                 campaignId: campana.id_campana,
                 llave_maestra: llaveMaestra,
             });
-        
+
             // Respuesta esperada: { init_point, preference_id }
             if (!res || (!res.init_point && !res.preference_id)) {
                 throw new Error("Respuesta inválida del servidor");
@@ -200,9 +200,23 @@ export default function DetalleCampana() {
                     <Text style={styles.backText}>Volver a campañas</Text>
                 </TouchableOpacity>
             </View>
+            <TouchableOpacity
+                style={styles.reportButton}
+                onPress={() =>
+                    router.push({
+                        pathname: "/(campanas)/ReportCampana",
+                        params: { id: id }, // pasa el id de la campaña
+                    })
+                }
+            >
+                <Text style={styles.reportButtonText}>🚨 Reportar campaña</Text>
+            </TouchableOpacity>
+
 
             {/* Card principal */}
             <View style={styles.card}>
+
+
                 {/* Carrusel */}
                 <View style={styles.carousel}>
                     {imagenes.length === 0 ? (
@@ -493,10 +507,23 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     payButtonText: { color: "white", fontWeight: "700" },
-      loader: {
+    loader: {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f5f3ff", 
+        backgroundColor: "#f5f3ff",
     },
+    reportButton: {
+        marginTop: 16,
+        backgroundColor: "#ef4444", // rojo para alertar
+        paddingVertical: 12,
+        borderRadius: 10,
+        alignItems: "center",
+    },
+    reportButtonText: {
+        color: "#fff",
+        fontWeight: "700",
+        fontSize: 16,
+    },
+
 });

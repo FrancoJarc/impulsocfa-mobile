@@ -35,6 +35,13 @@ export default function PerfilPanelHome() {
                 >
                     <Text style={styles.buttonText}>👤 Ver / editar mi perfil</Text>
                 </TouchableOpacity>
+                {/* Mis historias */}
+                <TouchableOpacity
+                    onPress={() => router.push("/(tabs)/perfilPanel/TusHist")}
+                    style={styles.button}
+                >
+                    <Text style={styles.buttonText}>Tus Historias</Text>
+                </TouchableOpacity>
 
                 <TouchableOpacity
                     onPress={async () => {

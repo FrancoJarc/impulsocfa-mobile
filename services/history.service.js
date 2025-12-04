@@ -141,3 +141,16 @@ export async function deleteHistory(id_historia) {
 
   return data;
 }
+export async function getHistoriesByCampaign(id_campana) {
+  try {
+    const res = await fetch(`${API_URL}/campaign/${id_campana}`);
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || "Error obteniendo historias de la campaña");
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
