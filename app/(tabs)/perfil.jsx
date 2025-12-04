@@ -3,6 +3,7 @@ import PerfilPanelHome from "../../components/Perfil/PerfilPanelHome";
 import { useContext, useEffect } from "react";
 import { UserContext } from "../context/UserContext";
 import { router } from "expo-router";
+import ValidadorPanelHome from "../../components/Validador/ValidadorPanelHome";
 
 export default function PerfilIndex() {
     const { user, loading } = useContext(UserContext);
@@ -15,5 +16,8 @@ export default function PerfilIndex() {
 
     if (loading || !user) return null;
 
-    return user.rol === "administrador" ? <AdminPanelHome /> : <PerfilPanelHome />;
+    if (user.rol === "administrador") return <AdminPanelHome />;
+    if (user.rol === "validador") return <ValidadorPanelHome />;
+
+    return <PerfilPanelHome />;
 }

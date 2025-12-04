@@ -13,7 +13,6 @@ export default function IndexScreen() {
     useEffect(() => {
         async function loadSession() {
             try {
-                // 1. Verifica si existe el token en AsyncStorage
                 const hasSession = await checkSession();
                 setIsAuth(hasSession);
             } catch (error) {

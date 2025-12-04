@@ -46,6 +46,7 @@ export default function TabsLayout() {
             ),
           }}
         />
+
         <Tabs.Screen
           name="perfil"
           options={{
@@ -65,6 +66,13 @@ export default function TabsLayout() {
 
         <Tabs.Screen
           name="perfilPanel"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="validadorPanel"
           options={{
             href: null,
           }}

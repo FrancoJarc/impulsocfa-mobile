@@ -1,6 +1,7 @@
 import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { logout } from "../../services/auth.service";
 
 
 export default function AdminPanelHome() {
@@ -31,7 +32,7 @@ export default function AdminPanelHome() {
 
         <TouchableOpacity
           onPress={async () => {
-            await AsyncStorage.removeItem("access_token");
+            await logout();
             router.replace("/(auth)/iniciarsesion");
           }}
           style={[styles.button, styles.logoutButton]}

@@ -113,30 +113,26 @@ export async function changePassword(llave_maestra, newPassword) {
 }
 
 // 🚪 Logout
+
 export async function logout() {
-    const token = await AsyncStorage.getItem("access_token");
-    if (!token) {
-        await AsyncStorage.multiRemove(["access_token", "user", "user_role"]);
-        return { message: "Sesión ya cerrada." };
+    try {
+        const token = await AsyncStorage.getItem("access_token");
+
+        // Llamar al endpoint solo si hay token
+        if (token) {
+            await fetch(`${API_URL}/logout`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        }
+        await AsyncStorage.multiRemove(["access_token", "user", "user_role", "refresh_token"]);
+    
+    } catch (err) {
+        console.log("Error en logout:", err);
     }
-
-    const res = await fetch(`${API_URL}/logout`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-        console.warn("Advertencia: Error de logout en API, limpiando localmente:", data.error);
-    }
-
-    await AsyncStorage.multiRemove(["access_token", "user", "user_role"]);
-
-    return data;
 }
 
 
