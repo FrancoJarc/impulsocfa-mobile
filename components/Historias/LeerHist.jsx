@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,124 +10,110 @@ import {
 import { useRouter } from "expo-router";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
+import { getAllHistories } from "../../services/history.service";
 
 export default function LeerHist() {
   const router = useRouter();
+  const [stories, setStories] = useState([]);
 
-  const stories = [
-    {
-      author: "María García",
-      title: "Cómo reconstruimos nuestro hogar",
-      excerpt:
-        "Después de las inundaciones, creíamos que todo estaba perdido. Gracias a esta comunidad, hoy mi familia tiene un nuevo comienzo.",
-      image: require("../../assets/images/family-home-reconstruction.jpg"),
-      date: "15 de noviembre, 2024",
-      views: 2340,
-      likes: 892,
-      category: "Hogares",
-    },
-    {
-      author: "Carlos Mendez",
-      title: "La educación cambió la vida de mis hijos",
-      excerpt:
-        "Recibir útiles y apoyo educativo fue transformacional. Ahora mis hijos pueden seguir estudiando sin limitaciones.",
-      image: require("../../assets/images/students-school-learning.jpg"),
-      date: "10 de noviembre, 2024",
-      views: 1856,
-      likes: 745,
-      category: "Educación",
-    },
-    {
-      author: "Ana López",
-      title: "Juntos restauramos nuestra comunidad",
-      excerpt:
-        "El espacio comunitario renovado se ha convertido en el corazón de nuestro barrio.",
-      image: require("../../assets/images/community-center-people.jpg"),
-      date: "05 de noviembre, 2024",
-      views: 3120,
-      likes: 1203,
-      category: "Comunidad",
-    },
-  ];
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await getAllHistories();
+        setStories(data);
+      } catch (err) {
+        console.log("Error cargando historias:", err);
+      }
+    }
+    load();
+  }, []);
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingBottom: 80 }}
-    >
-      {/* Hero */}
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 80 }}>
+
+      {/* HERO */}
       <Animated.View entering={FadeInUp.duration(700)} style={styles.hero}>
         <Text style={styles.heroTitle}>Historias Reales</Text>
         <Text style={styles.heroSubtitle}>
-          Conocé experiencias reales de personas que transformaron sus vidas
-          gracias a tu apoyo.
+          Conocé experiencias reales de personas que transformaron sus vidas gracias a tu apoyo.
         </Text>
       </Animated.View>
 
-      {/* Grid-like list */}
+      {/* LISTA DE HISTORIAS */}
       <View style={styles.cardsContainer}>
-        {stories.map((story, i) => (
-          <Animated.View
-            entering={FadeInUp.delay(i * 120).duration(600)}
-            key={i}
-            style={styles.card}
-          >
-            {/* Image */}
-            <View style={styles.imageWrapper}>
-              <Image source={story.image} style={styles.image} />
-              <View style={styles.categoryTag}>
-                <Text style={styles.categoryText}>{story.category}</Text>
-              </View>
-              <View style={styles.overlay} />
-            </View>
+        {stories.map((story, i) => {
+          const image = story.archivo1
+            ? { uri: story.archivo1 }
+            : { uri: "https://via.placeholder.com/300x200?text=Sin+Imagen" };
 
-            {/* Content */}
-            <View style={styles.cardContent}>
-              <Text style={styles.date}>{story.date}</Text>
-              <Text style={styles.title}>{story.title}</Text>
-              <Text style={styles.excerpt}>{story.excerpt}</Text>
+          return (
+            <Animated.View
+              key={story.id_historia}
+              entering={FadeInUp.delay(i * 120).duration(600)}
+              style={styles.card}
+            >
+              {/* Imagen */}
+              <View style={styles.imageWrapper}>
+                <Image source={image} style={styles.image} />
 
-              {/* Author */}
-              <View style={styles.authorRow}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>
-                    {story.author.charAt(0)}
+                <View style={styles.categoryTag}>
+                  <Text style={styles.categoryText}>
+                    {story.nombre_campana || "Historia"}
                   </Text>
                 </View>
-                <Text style={styles.authorName}>{story.author}</Text>
+
+                <View style={styles.overlay} />
               </View>
 
-              {/* Stats + Button */}
-              <View style={styles.footer}>
-                <View style={styles.statsRow}>
-                  <View style={styles.stat}>
-                    <Feather name="eye" size={16} color="#555" />
-                    <Text style={styles.statText}>
-                      {(story.views / 1000).toFixed(1)}K
-                    </Text>
+              {/* Content */}
+              <View style={styles.cardContent}>
+                <Text style={styles.date}>
+                  {new Date(story.fecha_creacion).toLocaleDateString("es-AR")}
+                </Text>
+
+                <Text style={styles.title}>{story.titulo}</Text>
+
+                <Text style={styles.excerpt}>
+                  {story.contenido?.slice(0, 140)}...
+                </Text>
+
+
+
+                {/* Footer */}
+                <View style={styles.footer}>
+                  <View style={styles.statsRow}>
+                    <View style={styles.stat}>
+                      <Feather name="eye" size={16} color="#555" />
+                      <Text style={styles.statText}>1.2K</Text>
+                    </View>
+
+                    <View style={styles.stat}>
+                      <Feather name="heart" size={16} color="#e11d48" />
+                      <Text style={[styles.statText, { color: "#e11d48" }]}>
+                        120
+                      </Text>
+                    </View>
                   </View>
 
-                  <View style={styles.stat}>
-                    <Feather name="heart" size={16} color="#e11d48" />
-                    <Text style={[styles.statText, { color: "#e11d48" }]}>
-                      {story.likes}
-                    </Text>
-                  </View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      router.push({
+                        pathname: "/historias/VerMasHist",
+                        params: { id: story.id_historia },
+                      })
+                    }
+                    style={styles.nextButton}
+                  >
+                    <Feather name="arrow-right" size={20} color="#7c3aed" />
+                  </TouchableOpacity>
                 </View>
-
-                <TouchableOpacity
-                  onPress={() => router.push("/historias/VerMasHist")}
-                  style={styles.nextButton}
-                >
-                  <Feather name="arrow-right" size={20} color="#7c3aed" />
-                </TouchableOpacity>
               </View>
-            </View>
-          </Animated.View>
-        ))}
+            </Animated.View>
+          );
+        })}
       </View>
 
-      {/* Button: Subir Historia */}
+      {/* BOTÓN SUBIR HISTORIA */}
       <Animated.View entering={FadeInUp.delay(400)} style={styles.buttonWrapper}>
         <TouchableOpacity
           onPress={() => router.push("/historias/FormHist")}
@@ -174,32 +160,22 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     borderRadius: 20,
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#e9d5ff",
-    shadowColor: "#7c3aed",
+    shadowColor: "#6d28d9",
     shadowOpacity: 0.15,
-    shadowRadius: 12,
+    shadowRadius: 10,
+    elevation: 4,
   },
 
   imageWrapper: {
-    height: 160,
+    height: 180,
     overflow: "hidden",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    backgroundColor: "#ddd",
   },
-
   image: {
-    height: "100%",
     width: "100%",
-  },
-
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.25)",
+    height: "100%",
   },
 
   categoryTag: {
@@ -213,8 +189,13 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     color: "white",
-    fontSize: 10,
-    fontWeight: "600",
+    fontSize: 11,
+    fontWeight: "bold",
+  },
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.25)",
   },
 
   cardContent: {
@@ -222,53 +203,46 @@ const styles = StyleSheet.create({
   },
 
   date: {
-    fontSize: 11,
+    fontSize: 12,
     color: "#6b7280",
-    marginBottom: 6,
+    marginBottom: 4,
   },
-
   title: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#1f2937",
+    fontWeight: "bold",
+    color: "#1e1b4b",
     marginBottom: 6,
   },
-
   excerpt: {
-    fontSize: 13,
-    color: "#4b5563",
+    fontSize: 14,
+    color: "#444",
     marginBottom: 12,
   },
 
   authorRow: {
     flexDirection: "row",
     alignItems: "center",
-    borderBottomColor: "#eee",
+    paddingBottom: 8,
     borderBottomWidth: 1,
-    paddingBottom: 10,
+    borderBottomColor: "#e9d5ff",
     marginBottom: 10,
-    gap: 10,
   },
-
   avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 20,
+    width: 35,
+    height: 35,
+    borderRadius: 999,
     backgroundColor: "#8b5cf6",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
   },
-
   avatarText: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 16,
   },
-
   authorName: {
-    color: "#374151",
-    fontSize: 14,
+    marginLeft: 10,
     fontWeight: "600",
+    color: "#333",
   },
 
   footer: {
@@ -279,9 +253,8 @@ const styles = StyleSheet.create({
 
   statsRow: {
     flexDirection: "row",
-    gap: 15,
+    gap: 16,
   },
-
   stat: {
     flexDirection: "row",
     alignItems: "center",
@@ -289,37 +262,32 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 13,
-    color: "#444",
+    color: "#555",
   },
 
   nextButton: {
     padding: 8,
     borderRadius: 50,
-    backgroundColor: "#f5f3ff",
+    backgroundColor: "#ede9fe",
   },
 
   buttonWrapper: {
     marginTop: 30,
     alignItems: "center",
-    paddingHorizontal: 20,
   },
-
   bigButton: {
-    backgroundColor: "#7c3aed",
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    paddingHorizontal: 30,
+    backgroundColor: "#7c3aed",
     paddingVertical: 14,
-    borderRadius: 20,
-    shadowColor: "#7c3aed",
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+    paddingHorizontal: 26,
+    borderRadius: 16,
+    elevation: 3,
   },
-
   bigButtonText: {
     color: "white",
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: "bold",
   },
 });
