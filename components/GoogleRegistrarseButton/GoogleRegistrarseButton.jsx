@@ -5,9 +5,13 @@ import { supabase } from "../../supabaseClient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as AuthSession from "expo-auth-session";
 import Constants from "expo-constants";
+import * as WebBrowser from "expo-web-browser";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleRegistrarseButton() {
     const [loading, setLoading] = useState(false);
+
 
     const loginWithGoogle = async () => {
         setLoading(true);
@@ -20,32 +24,23 @@ export default function GoogleRegistrarseButton() {
         });
 
         try {
-            const redirectTo = AuthSession.makeRedirectUri({ useProxy: false })
-            console.log("Redirect URL:", redirectTo);
-
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: "google",
-                options: { redirectTo },
+            const redirectTo = AuthSession.makeRedirectUri({
+                useProxy: process.env.NODE_ENV !== "production",
+                scheme: "impulsocfamobile",
+                path: "auth"
             });
 
-            if (error) {
-                console.log("Error en login con Google:", error.message);
+            console.log("Redirect URI en uso:", redirectTo);
 
-                Toast.show({
-                    type: 'error',
-                    text1: 'Error de autenticación',
-                    text2: error.message || "Error al iniciar sesión con Google 😕",
-                    position: 'top',
-                });
-            }
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: "google",
+                options: { redirectTo }
+            });
+
+            if (error) console.log("ERROR OAuth:", error);
 
         } catch (err) {
-            Toast.show({
-                type: 'error',
-                text1: 'Error de red',
-                text2: "No se pudo conectar con el servicio de Google.",
-                position: 'top',
-            });
+            console.log("Error general OAuth:", err);
         } finally {
             setLoading(false);
         }
