@@ -40,9 +40,6 @@ export default function UserProfileMobile({ navigation }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
 
-  // -------------------------------
-  // 🔹 Cargar usuario desde AsyncStorage
-  // -------------------------------
   useEffect(() => {
     async function loadUser() {
       try {
@@ -74,9 +71,6 @@ export default function UserProfileMobile({ navigation }) {
     loadUser();
   }, []);
 
-  // -------------------------------
-  // 🔹 Elegir imagen desde la galería
-  // -------------------------------
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       base64: false,
@@ -89,9 +83,6 @@ export default function UserProfileMobile({ navigation }) {
     }
   };
 
-  // -------------------------------
-  // 🔹 Guardar cambios del perfil
-  // -------------------------------
   const updateProfile = async () => {
     try {
       setSaving(true);
@@ -110,9 +101,6 @@ export default function UserProfileMobile({ navigation }) {
     }
   };
 
-  // -------------------------------
-  // 🔹 Deshabilitar cuenta
-  // -------------------------------
   const confirmDisable = () => setModalVisible(true);
 
   const disableAccountMobile = async () => {
@@ -134,255 +122,249 @@ export default function UserProfileMobile({ navigation }) {
   // ⬇ UI
   // -------------------------------
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1, padding: 20, backgroundColor: "#F8F5FF" }}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
-          <Text
-            style={{
-              fontSize: 32,
-              fontWeight: "bold",
-              textAlign: "center",
-              marginBottom: 20,
-              color: "#6d28d9",
-            }}
-          >
-            Mi Perfil
-          </Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F5FF" }}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, padding: 20, paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text
+          style={{
+            fontSize: 32,
+            fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: 20,
+            color: "#6d28d9",
+          }}
+        >
+          Mi Perfil
+        </Text>
 
-          {/* FOTO DE PERFIL */}
-          <View style={{ alignItems: "center", marginBottom: 20 }}>
-            <TouchableOpacity onPress={pickImage} style={{ position: "relative" }}>
-              <Image
-                source={
-                  preview
-                    ? { uri: preview }
-                    : require("../../assets/images/default-avatar.png")
-                }
-                style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: 100,
-                  borderWidth: 4,
-                  borderColor: "#c4b5fd",
-                }}
-              />
-
-              <View
-                style={{
-                  position: "absolute",
-                  bottom: -5,
-                  right: -5,
-                  backgroundColor: "#ddd6fe",
-                  padding: 8,
-                  borderRadius: 30,
-                }}
-              >
-                <Camera size={22} color="#6d28d9" />
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          {/* INPUTS */}
-          <Input
-            label="Nombre"
-            value={formData.nombre}
-            onChange={(t) => setFormData({ ...formData, nombre: t })}
-            icon={<UserRound size={20} color="#7c3aed" />}
-          />
-
-          <Input
-            label="Apellido"
-            value={formData.apellido}
-            onChange={(t) => setFormData({ ...formData, apellido: t })}
-            icon={<UserRound size={20} color="#7c3aed" />}
-          />
-
-          {/* FECHA DE NACIMIENTO */}
-          <Text style={{ marginBottom: 6, fontWeight: "600", color: "#4b5563" }}>
-            Fecha de nacimiento
-          </Text>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#ede9fe",
-              borderRadius: 12,
-              padding: 12,
-              borderColor: "#c4b5fd",
-              borderWidth: 1,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Calendar size={20} color="#7c3aed" />
-            <Text style={{ marginLeft: 10, color: "#4b5563" }}>
-              {formData.fecha_nacimiento || "Selecciona tu fecha de nacimiento"}
-            </Text>
-          </TouchableOpacity>
-
-          {showDatePicker && (
-            <DateTimePicker
-              value={
-                formData.fecha_nacimiento
-                  ? new Date(formData.fecha_nacimiento)
-                  : new Date()
+        {/* FOTO DE PERFIL */}
+        <View style={{ alignItems: "center", marginBottom: 20 }}>
+          <TouchableOpacity onPress={pickImage} style={{ position: "relative" }}>
+            <Image
+              source={
+                preview
+                  ? { uri: preview }
+                  : require("../../assets/images/default-avatar.png")
               }
-              mode="date"
-              display="default"
-              maximumDate={new Date()}
-              onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
-                if (selectedDate) {
-                  const isoDate = selectedDate.toISOString().split("T")[0];
-                  setFormData({ ...formData, fecha_nacimiento: isoDate });
-                }
+              style={{
+                width: 120,
+                height: 120,
+                borderRadius: 100,
+                borderWidth: 4,
+                borderColor: "#c4b5fd",
               }}
             />
-          )}
 
-          {/* NACIONALIDAD */}
-          <Text style={{ marginBottom: 6, fontWeight: "600", color: "#4b5563" }}>
-            Nacionalidad
-          </Text>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#ede9fe",
-              borderRadius: 12,
-              padding: 12,
-              borderColor: "#c4b5fd",
-              borderWidth: 1,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-            onPress={() => setShowCountryPicker(true)}
-          >
-            <Flag size={20} color="#7c3aed" />
-            <Text style={{ marginLeft: 10, color: "#4b5563" }}>
-              {formData.nacionalidad || "Selecciona tu país"}
-            </Text>
-          </TouchableOpacity>
-
-          <CountryPicker
-            visible={showCountryPicker}
-            withFilter
-            withFlag
-            withAlphaFilter
-            withCountryNameButton={false}
-            renderFlagButton={() => null}
-            onSelect={(country) => {
-              setFormData({ ...formData, nacionalidad: country.name });
-              setShowCountryPicker(false);
-            }}
-            onClose={() => setShowCountryPicker(false)}
-          />
-
-          {/* BOTONES */}
-          <TouchableOpacity
-            onPress={updateProfile}
-            disabled={saving}
-            style={{
-              marginTop: 20,
-              backgroundColor: "#8b5cf6",
-              paddingVertical: 14,
-              borderRadius: 12,
-              alignItems: "center",
-            }}
-          >
-            {saving ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={{ color: "#fff", fontSize: 16, fontWeight: "bold" }}>
-                Actualizar perfil
-              </Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={confirmDisable}
-            style={{
-              marginTop: 20,
-              backgroundColor: "#f43f5e",
-              paddingVertical: 14,
-              borderRadius: 12,
-              alignItems: "center",
-            }}
-          >
-            <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>
-              Deshabilitar cuenta
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-
-        {/* MODAL */}
-        <Modal transparent visible={modalVisible} animationType="fade">
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "rgba(0,0,0,0.4)",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
             <View
               style={{
-                backgroundColor: "white",
-                padding: 20,
-                borderRadius: 20,
-                width: "80%",
+                position: "absolute",
+                bottom: -5,
+                right: -5,
+                backgroundColor: "#ddd6fe",
+                padding: 8,
+                borderRadius: 30,
               }}
             >
-              <Text
+              <Camera size={22} color="#6d28d9" />
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* INPUTS */}
+        <Input
+          label="Nombre"
+          value={formData.nombre}
+          onChange={(t) => setFormData({ ...formData, nombre: t })}
+          icon={<UserRound size={20} color="#7c3aed" />}
+        />
+
+        <Input
+          label="Apellido"
+          value={formData.apellido}
+          onChange={(t) => setFormData({ ...formData, apellido: t })}
+          icon={<UserRound size={20} color="#7c3aed" />}
+        />
+
+        {/* FECHA DE NACIMIENTO */}
+        <Text style={{ marginBottom: 6, fontWeight: "600", color: "#4b5563" }}>
+          Fecha de nacimiento
+        </Text>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#ede9fe",
+            borderRadius: 12,
+            padding: 12,
+            borderColor: "#c4b5fd",
+            borderWidth: 1,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Calendar size={20} color="#7c3aed" />
+          <Text style={{ marginLeft: 10, color: "#4b5563" }}>
+            {formData.fecha_nacimiento || "Selecciona tu fecha de nacimiento"}
+          </Text>
+        </TouchableOpacity>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={
+              formData.fecha_nacimiento
+                ? new Date(formData.fecha_nacimiento)
+                : new Date()
+            }
+            mode="date"
+            display="default"
+            maximumDate={new Date()}
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                const isoDate = selectedDate.toISOString().split("T")[0];
+                setFormData({ ...formData, fecha_nacimiento: isoDate });
+              }
+            }}
+          />
+        )}
+
+        {/* NACIONALIDAD */}
+        <Text style={{ marginBottom: 6, marginTop: 15, fontWeight: "600", color: "#4b5563" }}>
+          Nacionalidad
+        </Text>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#ede9fe",
+            borderRadius: 12,
+            padding: 12,
+            borderColor: "#c4b5fd",
+            borderWidth: 1,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+          onPress={() => setShowCountryPicker(true)}
+        >
+          <Flag size={20} color="#7c3aed" />
+          <Text style={{ marginLeft: 10, color: "#4b5563" }}>
+            {formData.nacionalidad || "Selecciona tu país"}
+          </Text>
+        </TouchableOpacity>
+
+        <CountryPicker
+          visible={showCountryPicker}
+          withFilter
+          withFlag
+          withAlphaFilter
+          withCountryNameButton={false}
+          renderFlagButton={() => null}
+          onSelect={(country) => {
+            setFormData({ ...formData, nacionalidad: country.name });
+            setShowCountryPicker(false);
+          }}
+          onClose={() => setShowCountryPicker(false)}
+        />
+
+        {/* BOTONES */}
+        <TouchableOpacity
+          onPress={updateProfile}
+          disabled={saving}
+          style={{
+            marginTop: 20,
+            backgroundColor: "#8b5cf6",
+            paddingVertical: 14,
+            borderRadius: 12,
+            alignItems: "center",
+          }}
+        >
+          {saving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={{ color: "#fff", fontSize: 16, fontWeight: "bold" }}>
+              Actualizar perfil
+            </Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={confirmDisable}
+          style={{
+            marginTop: 20,
+            backgroundColor: "#f43f5e",
+            paddingVertical: 14,
+            borderRadius: 12,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>
+            Deshabilitar cuenta
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      {/* MODAL */}
+      <Modal transparent visible={modalVisible} animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.4)",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 20,
+              borderRadius: 20,
+              width: "80%",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                textAlign: "center",
+                marginBottom: 10,
+              }}
+            >
+              ¿Deshabilitar tu cuenta?
+            </Text>
+
+            <Text style={{ textAlign: "center", fontSize: 14, marginBottom: 20 }}>
+              No podrás acceder hasta que un administrador la reactive.
+            </Text>
+
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
                 style={{
-                  fontSize: 20,
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  marginBottom: 10,
+                  padding: 12,
+                  backgroundColor: "#e5e7eb",
+                  borderRadius: 10,
+                  width: "48%",
+                  alignItems: "center",
                 }}
               >
-                ¿Deshabilitar tu cuenta?
-              </Text>
+                <Text>Cancelar</Text>
+              </TouchableOpacity>
 
-              <Text
-                style={{ textAlign: "center", fontSize: 14, marginBottom: 20 }}
-              >
-                No podrás acceder hasta que un administrador la reactive.
-              </Text>
-
-              <View
+              <TouchableOpacity
+                onPress={disableAccountMobile}
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
+                  padding: 12,
+                  backgroundColor: "#f43f5e",
+                  borderRadius: 10,
+                  width: "48%",
+                  alignItems: "center",
                 }}
               >
-                <TouchableOpacity
-                  onPress={() => setModalVisible(false)}
-                  style={{
-                    padding: 12,
-                    backgroundColor: "#e5e7eb",
-                    borderRadius: 10,
-                    width: "48%",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text>Cancelar</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={disableAccountMobile}
-                  style={{
-                    padding: 12,
-                    backgroundColor: "#f43f5e",
-                    borderRadius: 10,
-                    width: "48%",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text style={{ color: "white" }}>Deshabilitar</Text>
-                </TouchableOpacity>
-              </View>
+                <Text style={{ color: "white" }}>Deshabilitar</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
-      </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

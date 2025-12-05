@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Animated, { FadeInUp } from "react-native-reanimated";
@@ -14,28 +15,47 @@ import { getAllHistories } from "../../services/history.service";
 
 export default function LeerHist() {
   const router = useRouter();
+
   const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(true); // ⏳ Nuevo estado
 
   useEffect(() => {
     async function load() {
       try {
         const data = await getAllHistories();
-        setStories(data);
+        setStories(data || []);
       } catch (err) {
         console.log("Error cargando historias:", err);
+        setStories([]);
+      } finally {
+        setLoading(false); // 👈 SOLO acá finaliza la carga
       }
     }
+
     load();
   }, []);
 
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 80 }}>
+  // ⏳ Mientras carga → SOLO spinner
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#7c3aed" />
+        <Text style={styles.loadingText}>Cargando historias...</Text>
+      </View>
+    );
+  }
 
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 80 }}
+    >
       {/* HERO */}
       <Animated.View entering={FadeInUp.duration(700)} style={styles.hero}>
         <Text style={styles.heroTitle}>Historias Reales</Text>
         <Text style={styles.heroSubtitle}>
-          Conocé experiencias reales de personas que transformaron sus vidas gracias a tu apoyo.
+          Conocé experiencias reales de personas que transformaron sus vidas
+          gracias a tu apoyo.
         </Text>
       </Animated.View>
 
@@ -76,8 +96,6 @@ export default function LeerHist() {
                 <Text style={styles.excerpt}>
                   {story.contenido?.slice(0, 140)}...
                 </Text>
-
-
 
                 {/* Footer */}
                 <View style={styles.footer}>
@@ -131,6 +149,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#faf5ff",
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#faf5ff",
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: "#7c3aed",
+    fontWeight: "600",
   },
 
   hero: {
@@ -217,32 +248,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#444",
     marginBottom: 12,
-  },
-
-  authorRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9d5ff",
-    marginBottom: 10,
-  },
-  avatar: {
-    width: 35,
-    height: 35,
-    borderRadius: 999,
-    backgroundColor: "#8b5cf6",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  authorName: {
-    marginLeft: 10,
-    fontWeight: "600",
-    color: "#333",
   },
 
   footer: {

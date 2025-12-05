@@ -1,8 +1,7 @@
-import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, ActivityIndicator, Modal } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { useEffect, useState } from "react";
 import { MotiView } from "moti";
-import { LinearGradient } from "expo-linear-gradient";
 import { ArrowLeft, Heart, Eye, MessageCircle, Trash2, Edit } from "lucide-react-native";
 import { getHistoryById, deleteHistory } from "../../services/history.service";
 import toast from "react-native-toast-message";
@@ -13,11 +12,10 @@ export default function VerMasHist() {
 
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
 
-  // Obtener userId del token para saber si puede editar/eliminar
-  const token = null;
   let userId = null;
-
   try {
     const storedToken = globalThis.localStorage?.getItem("access_token");
     if (storedToken) {
@@ -27,8 +25,6 @@ export default function VerMasHist() {
   } catch (err) {
     console.log("Error leyendo token:", err);
   }
-
-  const canEditOrDelete = userId === story?.id_usuario;
 
   useEffect(() => {
     async function loadStory() {
@@ -45,13 +41,13 @@ export default function VerMasHist() {
           category: data.campana?.titulo || "Historia",
           title: data.titulo,
           fullContent: data.contenido,
-          image: data.archivo1,
-          date: new Date(data.fecha_creacion).toLocaleDateString("es-AR"),
+          images: [data.archivo1, data.archivo2, data.archivo3].filter(Boolean),
+          date: data.fecha_creacion ? new Date(data.fecha_creacion).toLocaleDateString("es-AR") : "",
           views: Math.floor(Math.random() * 4000) + 1000,
           likes: Math.floor(Math.random() * 500) + 50,
         });
       } catch (err) {
-        console.log("Error", err);
+        console.log("Error cargando historia:", err);
       } finally {
         setLoading(false);
       }
@@ -60,10 +56,13 @@ export default function VerMasHist() {
     loadStory();
   }, [id]);
 
+  const canEditOrDelete = story && userId === story.id_usuario;
+
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text>Cargando historia...</Text>
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#6b4eff" />
+        <Text style={{ marginTop: 12, color: "#444" }}>Cargando historia...</Text>
       </View>
     );
   }
@@ -81,21 +80,29 @@ export default function VerMasHist() {
       type: "info",
       text1: "¿Eliminar historia?",
       text2: "Esta acción no se puede deshacer",
-      onPress: async () => {
-        try {
-          await deleteHistory(story.id_historia);
-          toast.show({ type: "success", text1: "Historia eliminada" });
-          router.push("/tushist");
-        } catch (err) {
-          toast.show({ type: "error", text1: "Error eliminando historia" });
-        }
-      },
     });
+
+    setTimeout(async () => {
+      try {
+        await deleteHistory(story.id_historia);
+        toast.show({ type: "success", text1: "Historia eliminada" });
+        router.push("/tushist");
+      } catch (err) {
+        toast.show({ type: "error", text1: "Error eliminando historia" });
+      }
+    }, 500);
   };
+
+  const openImageModal = (img) => {
+    setModalImage(img);
+    setModalVisible(true);
+  };
+
+  const images = story?.images ?? [];
 
   return (
     <ScrollView style={styles.container}>
-      
+
       {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -118,26 +125,13 @@ export default function VerMasHist() {
         )}
       </View>
 
-      {/* HERO */}
-      <MotiView
-        from={{ opacity: 0, translateY: 30 }}
-        animate={{ opacity: 1, translateY: 0 }}
-        transition={{ duration: 600 }}
-      >
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: story.image }} style={styles.image} />
-          <LinearGradient
-            colors={["transparent", "rgba(0,0,0,0.6)"]}
-            style={styles.gradient}
-          />
-          <View style={styles.heroText}>
-            <Text style={styles.category}>{story.category}</Text>
-            <Text style={styles.title}>{story.title}</Text>
-          </View>
-        </View>
-      </MotiView>
+      {/* TITLE + CATEGORY */}
+      <View style={{ paddingHorizontal: 16, marginBottom: 10 }}>
+        <Text style={styles.categoryTag}>{story.category}</Text>
+        <Text style={styles.titleText}>{story.title}</Text>
+      </View>
 
-      {/* AUTHOR */}
+      {/* AUTHOR INFO */}
       <MotiView
         from={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -155,6 +149,36 @@ export default function VerMasHist() {
         </View>
       </MotiView>
 
+      {/* CONTENT */}
+      <MotiView
+        from={{ opacity: 0, translateY: 20 }}
+        animate={{ opacity: 1, translateY: 0 }}
+        transition={{ duration: 700, delay: 250 }}
+        style={styles.contentBox}
+      >
+        {(story.fullContent || "").split("\n").map((p, i) => (
+          <Text key={i} style={styles.paragraph}>{p}</Text>
+        ))}
+      </MotiView>
+
+      {/* IMAGES CON MODAL */}
+      {images.length > 0 && (
+        <View style={styles.multiImageContainer}>
+          {images.map((img, idx) => (
+            <TouchableOpacity key={idx} onPress={() => openImageModal(img)} style={styles.imageWrapper}>
+              <Image source={{ uri: img }} style={styles.image} />
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {/* MODAL DE IMAGEN */}
+      <Modal visible={modalVisible} transparent={true}>
+        <TouchableOpacity style={styles.modalContainer} onPress={() => setModalVisible(false)}>
+          <Image source={{ uri: modalImage }} style={styles.fullImage} resizeMode="contain" />
+        </TouchableOpacity>
+      </Modal>
+
       {/* STATS */}
       <View style={styles.stats}>
         <View style={styles.statBox}>
@@ -168,29 +192,11 @@ export default function VerMasHist() {
           <Text style={styles.statNumber}>{story.likes}</Text>
           <Text style={styles.statLabel}>Me encanta</Text>
         </View>
-
-        <View style={styles.statBox}>
-          <MessageCircle size={18} color="#6b4eff" />
-          <Text style={styles.statNumber}>{Math.floor(story.likes / 10)}</Text>
-          <Text style={styles.statLabel}>Comentarios</Text>
-        </View>
       </View>
 
-      {/* CONTENT */}
-      <MotiView
-        from={{ opacity: 0, translateY: 20 }}
-        animate={{ opacity: 1, translateY: 0 }}
-        transition={{ duration: 700, delay: 250 }}
-        style={styles.contentBox}
-      >
-        {story.fullContent.split("\n").map((p, i) => (
-          <Text key={i} style={styles.paragraph}>{p}</Text>
-        ))}
-      </MotiView>
-               
-<Comments id_campana={story.id_campana} />
+      {/* COMMENTS */}
+      {story.id_campana ? <Comments id_campana={story.id_campana} /> : null}
 
-                  
     </ScrollView>
   );
 }
@@ -198,110 +204,33 @@ export default function VerMasHist() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f5f1ff" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-
-  backBtn: {
-    backgroundColor: "#eee",
-    padding: 8,
-    borderRadius: 20,
-  },
-
-  actions: { flexDirection: "row", gap: 12 },
-  iconBtn: { padding: 8, borderRadius: 20, backgroundColor: "#eee" },
-
-  imageContainer: {
-    width: "100%",
-    height: 280,
-    borderRadius: 20,
-    overflow: "hidden",
-    marginBottom: 20,
-  },
-
-  image: { width: "100%", height: "100%" },
-  gradient: { position: "absolute", width: "100%", height: "100%" },
-
-  heroText: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-  },
-
-  category: {
-    backgroundColor: "#6b4eff",
-    color: "white",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-    fontSize: 12,
-    marginBottom: 6,
-  },
-
-  title: {
-    color: "white",
-    fontSize: 28,
-    fontWeight: "700",
-    width: "90%",
-  },
-
-  authorCard: {
-    flexDirection: "row",
-    backgroundColor: "white",
-    marginHorizontal: 16,
-    padding: 16,
-    borderRadius: 16,
-    elevation: 2,
-    gap: 12,
-  },
-
-  authorIcon: {
-    width: 50, height: 50, borderRadius: 50,
-    backgroundColor: "#7c5cff",
+  loaderContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#f5f1ff",
   },
-
+  header: { flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 16, paddingVertical: 14, alignItems: "center" },
+  backBtn: { backgroundColor: "#eee", padding: 8, borderRadius: 20 },
+  actions: { flexDirection: "row", gap: 12 },
+  iconBtn: { padding: 8, borderRadius: 20, backgroundColor: "#eee" },
+  categoryTag: { backgroundColor: "#6b4eff", color: "white", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10, fontSize: 12, alignSelf: "flex-start", marginBottom: 6 },
+  titleText: { fontSize: 28, fontWeight: "700", color: "#333" },
+  authorCard: { flexDirection: "row", backgroundColor: "white", marginHorizontal: 16, padding: 16, borderRadius: 16, elevation: 2, gap: 12 },
+  authorIcon: { width: 50, height: 50, borderRadius: 50, backgroundColor: "#7c5cff", justifyContent: "center", alignItems: "center" },
   authorLetter: { fontSize: 22, color: "white", fontWeight: "bold" },
   authorName: { fontSize: 18, fontWeight: "bold" },
   authorBio: { fontSize: 12, color: "#666" },
   date: { fontSize: 10, color: "#999", marginTop: 4 },
-
-  stats: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginHorizontal: 16,
-    marginTop: 20,
-  },
-
-  statBox: {
-    backgroundColor: "white",
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    alignItems: "center",
-    width: "30%",
-  },
-
+  stats: { flexDirection: "row", justifyContent: "space-around", marginHorizontal: 16, marginTop: 20, marginBottom:20 },
+  statBox: { backgroundColor: "white", paddingVertical: 14, paddingHorizontal: 20, borderRadius: 16, alignItems: "center", width: "30%" },
   statNumber: { fontSize: 18, fontWeight: "bold", color: "#6b4eff" },
   statLabel: { fontSize: 10, color: "#666" },
-
-  contentBox: {
-    backgroundColor: "white",
-    margin: 16,
-    padding: 18,
-    borderRadius: 16,
-  },
-
-  paragraph: {
-    fontSize: 15,
-    color: "#444",
-    lineHeight: 22,
-    marginBottom: 8,
-  },
+  contentBox: { backgroundColor: "white", margin: 16, padding: 18, borderRadius: 16 },
+  paragraph: { fontSize: 15, color: "#444", lineHeight: 22, marginBottom: 8 },
+  multiImageContainer: { width: "92%", alignSelf: "center", marginBottom: 25, gap: 12 },
+  imageWrapper: { borderRadius: 16, overflow: "hidden", elevation: 3, marginBottom: 12 },
+  image: { width: "100%", height: 260, resizeMode: "cover" },
+  modalContainer: { flex: 1, backgroundColor: "rgba(0,0,0,0.9)", justifyContent: "center", alignItems: "center" },
+  fullImage: { width: "100%", height: "80%" },
 });

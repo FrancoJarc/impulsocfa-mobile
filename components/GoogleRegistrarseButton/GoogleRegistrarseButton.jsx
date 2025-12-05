@@ -18,10 +18,17 @@ export default function GoogleRegistrarseButton() {
 
         Toast.show({
             type: 'info',
+            text1: 'No disponible',
+            text2: 'Esta función estará disponible proximamente.',
+            position: 'top',
+        });
+        /*
+        Toast.show({
+            type: 'info',
             text1: 'Redirigiendo...',
             text2: 'Abriendo Google para iniciar sesión.',
             position: 'top',
-        });
+        });*/
 
         try {
             const redirectTo = AuthSession.makeRedirectUri({

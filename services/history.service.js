@@ -7,8 +7,6 @@ async function getToken() {
   return await AsyncStorage.getItem("access_token");
 }
 
-//1. Obtener TODAS las historias (NO requiere token)
-
 export async function getAllHistories() {
   const res = await fetch(`${API_URL}/`);
 
@@ -17,8 +15,6 @@ export async function getAllHistories() {
 
   return data;
 }
-
-//2. Obtener historia por ID (NO requiere token)
 
 export async function getHistoryById(id_historia) {
   const res = await fetch(`${API_URL}/${id_historia}`);
@@ -29,7 +25,7 @@ export async function getHistoryById(id_historia) {
   return data;
 }
 
-//3. Crear historia (token + archivos)
+
 export async function createHistory(historyData) {
   const token = await getToken();
   if (!token) throw new Error("No autenticado");
@@ -76,7 +72,7 @@ export async function createHistory(historyData) {
   return data;
 }
 
-//4. Actualizar historia (token + archivos opcionales)
+
 
 export async function updateHistory(id_historia, updateData) {
   const token = await getToken();
@@ -96,7 +92,6 @@ export async function updateHistory(id_historia, updateData) {
     }
   }
 
-  // Archivos nuevos opcionales
   ["archivo1", "archivo2", "archivo3"].forEach((fileKey) => {
     if (updateData[fileKey]) {
       formData.append(fileKey, {
@@ -123,7 +118,6 @@ export async function updateHistory(id_historia, updateData) {
   return data;
 }
 
-//5. Eliminar historia (requiere token)
 
 export async function deleteHistory(id_historia) {
   const token = await getToken();

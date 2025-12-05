@@ -118,6 +118,7 @@ export default function IniciarSesionForm() {
                     </TouchableOpacity>
                 </View>
 
+                
                 <View style={styles.separatorContainer}>
                     <View style={styles.separatorLine} />
                     <Text style={styles.separatorText}>O continúa con</Text>

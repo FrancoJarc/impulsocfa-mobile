@@ -20,21 +20,21 @@ export default function PerfilPanelHome() {
                     onPress={() => router.push("/(tabs)/perfilPanel/TodasDonaciones")}
                     style={styles.button}
                 >
-                    <Text style={styles.buttonText}>Donaciones de tus campañas</Text>
+                    <Text style={styles.buttonText}>Donaciones recibidas</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     onPress={() => router.push("/(tabs)/perfilPanel/CreateCampanaForm")}
                     style={styles.button}
                 >
-                    <Text style={styles.buttonText}>➕ Crear campaña</Text>
+                    <Text style={styles.buttonText}>Crear campaña</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     onPress={() => router.push("/(tabs)/perfilPanel/UserProfile")}
                     style={styles.button}
                 >
-                    <Text style={styles.buttonText}>👤 Ver / editar mi perfil</Text>
+                    <Text style={styles.buttonText}>Editar mi perfil</Text>
                 </TouchableOpacity>
                 {/* Mis historias */}
                 <TouchableOpacity

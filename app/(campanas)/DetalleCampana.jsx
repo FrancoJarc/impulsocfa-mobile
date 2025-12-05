@@ -200,17 +200,7 @@ export default function DetalleCampana() {
                     <Text style={styles.backText}>Volver a campañas</Text>
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity
-                style={styles.reportButton}
-                onPress={() =>
-                    router.push({
-                        pathname: "/(campanas)/ReportCampana",
-                        params: { id: id }, // pasa el id de la campaña
-                    })
-                }
-            >
-                <Text style={styles.reportButtonText}>🚨 Reportar campaña</Text>
-            </TouchableOpacity>
+
 
 
             {/* Card principal */}
@@ -370,11 +360,25 @@ export default function DetalleCampana() {
                     </View>
 
                     {/* Comentarios y últimas donaciones (componentes) */}
-                    <View style={{ marginTop: 30 }}>
+                    <View style={{ marginTop: 10 }}>
                         <Comments id_campana={id} />
                         <UltimasDonaciones id_campana={id} />
                     </View>
                 </View>
+
+
+                <TouchableOpacity
+                    style={styles.reportButtonFinal}
+                    onPress={() =>
+                        router.push({
+                            pathname: "/(campanas)/ReportCampana",
+                            params: { id: id },
+                        })
+                    }
+                >
+                    <Ionicons name="alert-circle-outline" size={16} color="#7c3aed" />
+                    <Text style={styles.reportButtonTextFinal}>Reportar campaña</Text>
+                </TouchableOpacity>
             </View>
 
             <Toast />
@@ -513,17 +517,32 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#f5f3ff",
     },
-    reportButton: {
-        marginTop: 16,
-        backgroundColor: "#ef4444", // rojo para alertar
-        paddingVertical: 12,
-        borderRadius: 10,
+    reportButtonFinal: {
+        marginTop: 35,
+        marginBottom: 40,          
+        flexDirection: "row",
         alignItems: "center",
+        alignSelf: "center",
+        gap: 10,
+
+        paddingVertical: 14,       
+        paddingHorizontal: 42,     
+
+        borderRadius: 10,
+        borderWidth: 2,            
+        borderColor: "#7c3aed",
+        backgroundColor: "#f3e8ff", 
+
+        shadowColor: "#7c3aed",     
+        shadowOpacity: 0.15,
+        shadowRadius: 6,
+        elevation: 3,
     },
-    reportButtonText: {
-        color: "#fff",
+
+    reportButtonTextFinal: {
+        color: "#7c3aed",
+        fontSize: 16,              
         fontWeight: "700",
-        fontSize: 16,
     },
 
 });
