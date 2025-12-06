@@ -67,7 +67,7 @@ export default function TusHist() {
 
     const fetchStories = async () => {
       try {
-        setLoading(true); // 🔥 importante: activar loading aquí
+        setLoading(true); 
         const allStories = await getAllHistories();
 
         const userStories = allStories.filter(
@@ -204,10 +204,7 @@ export default function TusHist() {
           >
             <TouchableOpacity
               onPress={() =>
-                router.push({
-                  pathname: "/historias/VerMasHist",
-                  params: { id: story.id_historia },
-                })
+                router.push(`/perfilPanel/EditHist?id=${story.id_historia}`)
               }
               style={{
                 width: cardWidth,

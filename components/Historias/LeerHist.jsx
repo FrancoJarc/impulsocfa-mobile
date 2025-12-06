@@ -17,8 +17,7 @@ export default function LeerHist() {
   const router = useRouter();
 
   const [stories, setStories] = useState([]);
-  const [loading, setLoading] = useState(true); // ⏳ Nuevo estado
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function load() {
       try {

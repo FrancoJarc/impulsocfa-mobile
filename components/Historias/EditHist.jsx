@@ -1,9 +1,16 @@
 import { useState, useEffect } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { View, Text, TextInput, Image, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { getHistoryById, updateHistory } from "../../services/history.service";
-import Animated from "react-native-reanimated";
 
 export default function EditHist() {
   const { id } = useLocalSearchParams();
@@ -27,12 +34,10 @@ export default function EditHist() {
     const fetchStory = async () => {
       try {
         const data = await getHistoryById(id);
-
         setForm({
           titulo: data.titulo || "",
           contenido: data.contenido || "",
         });
-
       } catch (err) {
         console.log("Error cargando historia:", err);
       } finally {
@@ -68,62 +73,135 @@ export default function EditHist() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f3f0ff",
+        }}
+      >
         <ActivityIndicator size="large" color="#6d28d9" />
       </View>
     );
   }
 
   return (
-    <ScrollView className="flex-1 bg-[#f3f0ff] px-4 py-6">
-
-      <Text className="text-3xl font-bold text-center text-violet-700 mb-6">
+    <ScrollView
+      style={{
+        flex: 1,
+        backgroundColor: "#f3f0ff",
+        paddingHorizontal: 16,
+        paddingVertical: 24,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 28,
+          fontWeight: "bold",
+          textAlign: "center",
+          color: "#7c3aed",
+          marginBottom: 24,
+          marginTop: 15,
+        }}
+      >
         Editar Historia
       </Text>
 
       {/* TÍTULO */}
-      <Text className="text-lg text-violet-700 font-semibold mb-2">Título</Text>
+      <Text
+        style={{
+          fontSize: 18,
+          fontWeight: "600",
+          color: "#7c3aed",
+          marginBottom: 8,
+        }}
+      >
+        Título
+      </Text>
       <TextInput
         value={form.titulo}
         onChangeText={(t) => setForm({ ...form, titulo: t })}
         placeholder="Ej: Cómo reconstruimos nuestro hogar"
-        className="bg-white p-4 rounded-xl border border-violet-300 text-gray-800 mb-6"
+        style={{
+          backgroundColor: "#fff",
+          padding: 20,
+          borderRadius: 20,
+          borderWidth: 1,
+          borderColor: "#c4b5fd",
+          color: "#111",
+          marginBottom: 24,
+        }}
       />
 
       {/* CONTENIDO */}
-      <Text className="text-lg text-violet-700 font-semibold mb-2">Contenido</Text>
+      <Text
+        style={{
+          fontSize: 18,
+          fontWeight: "600",
+          color: "#7c3aed",
+          marginBottom: 8,
+        }}
+      >
+        Contenido
+      </Text>
       <TextInput
         value={form.contenido}
         onChangeText={(t) => setForm({ ...form, contenido: t })}
         placeholder="Cuéntanos tu historia..."
         multiline
         numberOfLines={6}
-        className="bg-white p-4 rounded-xl border border-violet-300 text-gray-800 mb-6"
+        style={{
+          backgroundColor: "#fff",
+          padding: 20,
+          borderRadius: 20,
+          borderWidth: 1,
+          borderColor: "#c4b5fd",
+          color: "#111",
+          marginBottom: 24,
+          textAlignVertical: "top",
+        }}
       />
 
       {/* MULTIMEDIA */}
-      <Text className="text-lg text-violet-700 font-semibold mb-3">
+      <Text
+        style={{
+          fontSize: 18,
+          fontWeight: "600",
+          color: "#7c3aed",
+          marginBottom: 12,
+        }}
+      >
         Actualizar Multimedia (Opcional)
       </Text>
 
-      <View className="flex-row justify-between mb-6">
+      <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 24 }}>
         {[1, 2, 3].map((num) => {
           const key = `archivo${num}`;
           const img = files[key];
-
           return (
             <TouchableOpacity
               key={num}
               onPress={() => pickImage(key)}
-              className="w-[30%] h-28 bg-white rounded-xl border border-violet-300 items-center justify-center overflow-hidden"
+              style={{
+                width: "30%",
+                height: 120,
+                backgroundColor: "#fff",
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: "#c4b5fd",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
             >
               <Image
-                source={
-                  img
-                    ? { uri: img.uri }
-                    : { uri: "https://via.placeholder.com/300x200?text=Sin+Imagen" }
-                }
-                className="w-full h-full"
+                source={{
+                  uri: img
+                    ? img.uri
+                    : "https://via.placeholder.com/300x200?text=Sin+Imagen",
+                }}
+                style={{ width: "100%", height: "100%" }}
                 resizeMode="cover"
               />
             </TouchableOpacity>
@@ -135,18 +213,43 @@ export default function EditHist() {
       <TouchableOpacity
         onPress={handleSubmit}
         disabled={submitting}
-        className="bg-violet-600 py-4 rounded-2xl mb-4"
+        style={{
+          backgroundColor: "#7c3aed",
+          paddingVertical: 16,
+          borderRadius: 24,
+          marginBottom: 16,
+        }}
       >
-        <Text className="text-white text-center font-bold text-lg">
+        <Text
+          style={{
+            color: "#fff",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 16,
+          }}
+        >
           {submitting ? "Actualizando..." : "Guardar Cambios"}
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => router.push(`/vermashist/${id}`)}
-        className="bg-gray-300 py-4 rounded-2xl"
+        style={{
+          backgroundColor: "#d1d5db",
+          paddingVertical: 16,
+          borderRadius: 24,
+        }}
       >
-        <Text className="text-center text-gray-700 font-bold">Cancelar</Text>
+        <Text
+          style={{
+            color: "#374151",
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 16,
+          }}
+        >
+          Cancelar
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
