@@ -60,7 +60,7 @@ export default function TodasDonaciones() {
 
         setDonaciones(all);
       } catch (e) {
-        alert(e.message);
+        console.log(e.message);
       } finally {
         setLoading(false);
       }

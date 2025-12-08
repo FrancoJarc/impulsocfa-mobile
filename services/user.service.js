@@ -5,13 +5,13 @@ const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/user`;
 
 //  Obtener usuario actual
 export async function getCurrentUser() {
-  const token = await AsyncStorage.getItem("access_token");
-  if (!token) throw new Error("No estás autenticado");
+  const userJson = await AsyncStorage.getItem("user");
 
-  const { data, error } = await supabase.auth.getUser(token);
-  if (error) throw new Error(error.message);
+  if (!userJson) {
+    throw new Error("No hay usuario guardado");
+  }
 
-  return data.user;
+  return JSON.parse(userJson); 
 }
 
 //  Actualizar perfil del usuario

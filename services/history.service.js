@@ -73,50 +73,46 @@ export async function createHistory(historyData) {
 }
 
 
-
-export async function updateHistory(id_historia, updateData) {
-  const token = await getToken();
+export async function updateHistory(id, data) {
+  const token = await AsyncStorage.getItem("access_token");
   if (!token) throw new Error("No autenticado");
 
   const formData = new FormData();
 
-  for (const key in updateData) {
-    if (
-      updateData[key] !== undefined &&
-      updateData[key] !== null &&
-      key !== "archivo1" &&
-      key !== "archivo2" &&
-      key !== "archivo3"
-    ) {
-      formData.append(key, updateData[key]);
-    }
-  }
+  // Campos de texto
+  formData.append("titulo", data.titulo);
+  formData.append("contenido", data.contenido);
 
-  ["archivo1", "archivo2", "archivo3"].forEach((fileKey) => {
-    if (updateData[fileKey]) {
-      formData.append(fileKey, {
-        uri: updateData[fileKey].uri,
-        name: updateData[fileKey].name || `${fileKey}.jpg`,
-        type: updateData[fileKey].type || "image/jpeg",
+  // Archivos opcionales
+  ["archivo1", "archivo2", "archivo3"].forEach((key) => {
+    const file = data[key];
+    if (file && file.uri) {
+      formData.append(key, {
+        uri: file.uri,
+        name: file.fileName || `${key}.jpg`,
+        type: file.mimeType || "image/jpeg",
       });
     }
   });
 
-  const res = await fetch(`${API_URL}/${id_historia}`, {
+  const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-      "Content-Type": "multipart/form-data",
+      "Authorization": `Bearer ${token}`,
     },
     body: formData,
   });
 
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Error al actualizar historia");
+  const json = await res.json();
 
-  return data;
+  if (!res.ok) {
+    console.log("Error en updateHistory:", json);
+    throw new Error(json.error || "Error al actualizar historia");
+  }
+
+  return json;
 }
+
 
 
 export async function deleteHistory(id_historia) {

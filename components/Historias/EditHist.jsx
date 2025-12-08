@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { getHistoryById, updateHistory } from "../../services/history.service";
+import Toast from "react-native-toast-message";
+
 
 export default function EditHist() {
   const { id } = useLocalSearchParams();
@@ -61,15 +63,23 @@ export default function EditHist() {
 
   const handleSubmit = async () => {
     setSubmitting(true);
+
     try {
       await updateHistory(id, { ...form, ...files });
-      router.push(`/vermashist/${id}`);
+      Toast.show({
+        type: 'success',
+        text1: "Historia modificada con éxito",
+        visibilityTime: 4000,
+      });
+      router.push("/(tabs)/perfilPanel/TusHist"); 
     } catch (err) {
       console.log("Error actualizando historia:", err);
+      Alert.alert("Error", "No se pudo actualizar la historia.");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   if (loading) {
     return (
@@ -233,7 +243,7 @@ export default function EditHist() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => router.push(`/vermashist/${id}`)}
+        onPress={() => router.push("/(tabs)/perfilPanel/TusHist")}
         style={{
           backgroundColor: "#d1d5db",
           paddingVertical: 16,

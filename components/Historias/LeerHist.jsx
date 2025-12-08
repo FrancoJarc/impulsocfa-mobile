@@ -11,6 +11,7 @@ import {
 import { useRouter } from "expo-router";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
+import { Video } from "expo-av";
 import { getAllHistories } from "../../services/history.service";
 
 export default function LeerHist() {
@@ -18,6 +19,7 @@ export default function LeerHist() {
 
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     async function load() {
       try {
@@ -27,14 +29,13 @@ export default function LeerHist() {
         console.log("Error cargando historias:", err);
         setStories([]);
       } finally {
-        setLoading(false); // 👈 SOLO acá finaliza la carga
+        setLoading(false);
       }
     }
 
     load();
   }, []);
 
-  // ⏳ Mientras carga → SOLO spinner
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -58,12 +59,16 @@ export default function LeerHist() {
         </Text>
       </Animated.View>
 
-      {/* LISTA DE HISTORIAS */}
+      {/* LISTA */}
       <View style={styles.cardsContainer}>
         {stories.map((story, i) => {
-          const image = story.archivo1
-            ? { uri: story.archivo1 }
-            : { uri: "https://via.placeholder.com/300x200?text=Sin+Imagen" };
+          const file = story.archivo1;
+
+          const isVideo =
+            file && (file.endsWith(".mp4") ||
+              file.endsWith(".mov") ||
+              file.endsWith(".avi") ||
+              file.endsWith(".webm"));
 
           return (
             <Animated.View
@@ -71,9 +76,29 @@ export default function LeerHist() {
               entering={FadeInUp.delay(i * 120).duration(600)}
               style={styles.card}
             >
-              {/* Imagen */}
               <View style={styles.imageWrapper}>
-                <Image source={image} style={styles.image} />
+                {isVideo ? (
+                  <Video
+                    source={{ uri: file }}
+                    style={styles.image}
+                    resizeMode="cover"
+                    useNativeControls={false}
+                    isLooping
+                    shouldPlay
+                    isMuted={true}
+                  />
+                ) : (
+                  <Image
+                    source={
+                      file
+                        ? { uri: file }
+                        : {
+                          uri: "https://via.placeholder.com/300x200?text=Sin+Imagen",
+                        }
+                    }
+                    style={styles.image}
+                  />
+                )}
 
                 <View style={styles.categoryTag}>
                   <Text style={styles.categoryText}>
@@ -84,7 +109,6 @@ export default function LeerHist() {
                 <View style={styles.overlay} />
               </View>
 
-              {/* Content */}
               <View style={styles.cardContent}>
                 <Text style={styles.date}>
                   {new Date(story.fecha_creacion).toLocaleDateString("es-AR")}
@@ -96,18 +120,17 @@ export default function LeerHist() {
                   {story.contenido?.slice(0, 140)}...
                 </Text>
 
-                {/* Footer */}
                 <View style={styles.footer}>
                   <View style={styles.statsRow}>
                     <View style={styles.stat}>
                       <Feather name="eye" size={16} color="#555" />
-                      <Text style={styles.statText}>1.2K</Text>
+                      <Text style={styles.statText}>1.9K</Text>
                     </View>
 
                     <View style={styles.stat}>
                       <Feather name="heart" size={16} color="#e11d48" />
                       <Text style={[styles.statText, { color: "#e11d48" }]}>
-                        120
+                        100
                       </Text>
                     </View>
                   </View>
@@ -130,7 +153,7 @@ export default function LeerHist() {
         })}
       </View>
 
-      {/* BOTÓN SUBIR HISTORIA */}
+      {/* BOTÓN SUBIR */}
       <Animated.View entering={FadeInUp.delay(400)} style={styles.buttonWrapper}>
         <TouchableOpacity
           onPress={() => router.push("/historias/FormHist")}
