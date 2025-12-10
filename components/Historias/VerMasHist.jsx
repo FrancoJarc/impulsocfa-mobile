@@ -8,7 +8,7 @@ import { getHistoryById } from "../../services/history.service";
 import Comments from "../Comentarios/Comments";
 
 export default function VerMasHist() {
-  const { id } = useLocalSearchParams();
+  const { id, views, likes } = useLocalSearchParams();
 
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,8 +38,8 @@ export default function VerMasHist() {
           fullContent: data.contenido,
           media: [data.archivo1, data.archivo2, data.archivo3].filter(Boolean),
           date: data.fecha_creacion ? new Date(data.fecha_creacion).toLocaleDateString("es-AR") : "",
-          views: Math.floor(Math.random() * 4000) + 1000,
-          likes: Math.floor(Math.random() * 500) + 50,
+          views: Number(views) || 0,   
+          likes: Number(likes) || 0,
         });
       } catch (err) {
         console.log("Error cargando historia:", err);
@@ -163,13 +163,14 @@ export default function VerMasHist() {
       <View style={styles.stats}>
         <View style={styles.statBox}>
           <Eye size={18} color="#6b4eff" />
-          <Text style={styles.statNumber}>{(story.views / 1000).toFixed(1)}K</Text>
-          <Text style={styles.statLabel}>Vistas</Text>
+          <Text style={styles.statText}>{story.views}</Text>
         </View>
 
         <View style={styles.statBox}>
           <Heart size={18} color="#d90429" />
-          <Text style={styles.statNumber}>{story.likes}</Text>
+          <Text style={[styles.statText, { color: "#e11d48" }]}>
+            {story.likes}
+          </Text>
           <Text style={styles.statLabel}>Me encanta</Text>
         </View>
       </View>

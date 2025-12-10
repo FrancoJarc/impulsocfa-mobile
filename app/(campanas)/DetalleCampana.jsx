@@ -305,6 +305,7 @@ export default function DetalleCampana() {
                                 placeholder="Ingresá el monto a donar"
                                 keyboardType="numeric"
                                 style={styles.amountInput}
+                                placeholderTextColor="#3f3f3fd1"
                             />
                         </View>
 
@@ -341,6 +342,8 @@ export default function DetalleCampana() {
                             placeholder="Ingresá tu llave maestra"
                             secureTextEntry
                             style={styles.generalInput}
+                            placeholderTextColor="#3f3f3fd1"
+
                         />
                         <Text style={styles.hintText}>
                             🔒 Pedimos tu llave maestra para confirmar que sos el titular de la cuenta.
@@ -480,6 +483,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderWidth: 1,
         borderColor: "#e6e0ff",
+        
     },
 
     breakdown: {

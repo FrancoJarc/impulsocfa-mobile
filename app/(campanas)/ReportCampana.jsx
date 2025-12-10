@@ -61,7 +61,7 @@ export default function ReportCampana() {
       </Text>
 
       <View style={styles.buttonsRow}>
-        <TouchableOpacity style={styles.cancelBtn} onPress={() => router.push(`/campanas/${id}`)}>
+        <TouchableOpacity style={styles.cancelBtn} onPress={() => router.back()}>
           <Text style={styles.btnText}>Cancelar</Text>
         </TouchableOpacity>
 

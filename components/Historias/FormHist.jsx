@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,14 +11,19 @@ import {
   StyleSheet,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getUserCampaigns } from "../../services/campaign.service";
 import { createHistory } from "../../services/history.service";
+import Toast from "react-native-toast-message";
 
-export default function FormHistMobile({ campañas = [], onSuccess }) {
+export default function FormHistMobile({ onSuccess }) {
   const [form, setForm] = useState({
     titulo: "",
     contenido: "",
     id_campana: "",
   });
+
+  const [campañas, setCampañas] = useState([]);
 
   const [files, setFiles] = useState({
     archivo1: null,
@@ -27,12 +32,36 @@ export default function FormHistMobile({ campañas = [], onSuccess }) {
   });
 
   const [loading, setLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  // 🔥 NUEVO: cargar campañas automáticamente
+  useEffect(() => {
+    const loadCampaigns = async () => {
+      try {
+        const userData = await AsyncStorage.getItem("user");
+        if (!userData) return;
+
+        const parsed = JSON.parse(userData);
+        const userId = parsed?.id_usuario;
+
+        if (!userId) return;
+
+        const data = await getUserCampaigns(userId);
+
+        setCampañas(data || []);
+      } catch (e) {
+        console.log("Error cargando campañas:", e);
+      }
+    };
+
+    loadCampaigns();
+  }, []);
 
   const handleChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
 
-  // 📸 Seleccionar imagen
+  // 📸 Seleccionar archivo
   const pickFile = async (field) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -53,15 +82,23 @@ export default function FormHistMobile({ campañas = [], onSuccess }) {
     }
   };
 
-  // 🚀 Enviar datos (ya conectado al backend)
+  // 🚀 Enviar datos
   const handleSubmit = async () => {
     if (!form.titulo || !form.contenido || !form.id_campana) {
-      alert("Completa todos los campos obligatorios.");
+      Toast.show({
+        type: "error",
+        text1: "Campos incompletos",
+        text2: "Completa todos los campos obligatorios.",
+      });
       return;
     }
 
     if (!files.archivo1) {
-      alert("Debes subir al menos una imagen.");
+      Toast.show({
+        type: "error",
+        text1: "Archivo requerido",
+        text2: "Debes subir al menos una foto o video.",
+      });
       return;
     }
 
@@ -80,16 +117,24 @@ export default function FormHistMobile({ campañas = [], onSuccess }) {
 
       await createHistory(formData);
 
-      // limpiar form
       setForm({ titulo: "", contenido: "", id_campana: "" });
       setFiles({ archivo1: null, archivo2: null, archivo3: null });
 
       if (onSuccess) onSuccess();
-      alert("Historia subida con éxito 💜");
+
+      Toast.show({
+        type: "success",
+        text1: "Historia subida",
+        text2: "Tu historia se publicó correctamente 💜",
+      });
 
     } catch (e) {
       console.log("Error subiendo historia:", e);
-      alert("Ocurrió un error al subir la historia.");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Ocurrió un problema al subir la historia.",
+      });
     }
 
     setLoading(false);
@@ -103,7 +148,7 @@ export default function FormHistMobile({ campañas = [], onSuccess }) {
       }}
     >
       <ScrollView contentContainerStyle={styles.container}>
-        
+
         {/* TÍTULO PRINCIPAL */}
         <Text style={styles.mainTitle}>Crear Historia</Text>
         <Text style={styles.subtitle}>
@@ -139,24 +184,37 @@ export default function FormHistMobile({ campañas = [], onSuccess }) {
         <View style={styles.block}>
           <Text style={styles.label}>Campaña *</Text>
 
-          <View style={styles.selectBox}>
+          <TouchableOpacity
+            style={styles.selectBox}
+            onPress={() => setShowDropdown((prev) => !prev)}
+          >
             <Text style={styles.selectText}>
               {form.id_campana
                 ? campañas.find((c) => c.id_campana === form.id_campana)?.titulo
                 : "Seleccionar campaña..."}
             </Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={{ marginTop: 6 }}>
-            {campañas.map((c) => (
-              <TouchableOpacity
-                key={c.id_campana}
-                onPress={() => handleChange("id_campana", c.id_campana)}
-              >
-                <Text style={styles.option}>{c.titulo}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          {campañas.length === 0 && (
+            <Text style={styles.emptyMsg}>Primero debes crear una campaña</Text>
+          )}
+
+          {showDropdown && campañas.length > 0 && (
+            <View style={styles.dropdown}>
+              {campañas.map((c) => (
+                <TouchableOpacity
+                  key={c.id_campana}
+                  style={styles.optionBox}
+                  onPress={() => {
+                    handleChange("id_campana", c.id_campana);
+                    setShowDropdown(false);
+                  }}
+                >
+                  <Text style={styles.option}>{c.titulo}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* ARCHIVOS */}
@@ -321,4 +379,26 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 60,
   },
+
+  dropdown: {
+    backgroundColor: "white",
+    borderWidth: 2,
+    borderColor: "#ddd6fe",
+    borderRadius: 16,
+    marginTop: 6,
+    paddingVertical: 4,
+  },
+
+  optionBox: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+
+  emptyMsg: {
+    marginTop: 6,
+    fontSize: 14,
+    color: "#9b2c2c",
+    fontWeight: "600",
+  },
+
 });

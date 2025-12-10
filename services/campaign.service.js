@@ -122,7 +122,8 @@ export async function updateCampaign(id, campaignData) {
 
 // ✅ Obtener campañas del usuario logueado
 export async function getUserCampaigns(userId) {
-    const token = await getToken();
+    const token = await AsyncStorage.getItem("access_token");
+    
 
     const res = await fetch(`${API_URL}?id_usuario=${userId}`, {
         headers: { Authorization: `Bearer ${token}` },

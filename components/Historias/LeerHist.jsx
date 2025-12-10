@@ -62,8 +62,11 @@ export default function LeerHist() {
       {/* LISTA */}
       <View style={styles.cardsContainer}>
         {stories.map((story, i) => {
-          const file = story.archivo1;
 
+          const randomViews = Math.floor(Math.random() * (5000 - 300 + 1)) + 300;
+          const randomLikes = Math.floor(Math.random() * (500 - 10 + 1)) + 10;
+
+          const file = story.archivo1;
           const isVideo =
             file && (file.endsWith(".mp4") ||
               file.endsWith(".mov") ||
@@ -124,13 +127,13 @@ export default function LeerHist() {
                   <View style={styles.statsRow}>
                     <View style={styles.stat}>
                       <Feather name="eye" size={16} color="#555" />
-                      <Text style={styles.statText}>1.9K</Text>
+                      <Text style={styles.statText}>{randomViews}</Text>
                     </View>
 
                     <View style={styles.stat}>
                       <Feather name="heart" size={16} color="#e11d48" />
                       <Text style={[styles.statText, { color: "#e11d48" }]}>
-                        100
+                        {randomLikes}
                       </Text>
                     </View>
                   </View>
@@ -139,7 +142,11 @@ export default function LeerHist() {
                     onPress={() =>
                       router.push({
                         pathname: "/historias/VerMasHist",
-                        params: { id: story.id_historia },
+                        params: {
+                          id: story.id_historia,
+                          views: randomViews.toString(),
+                          likes: randomLikes.toString()
+                        }
                       })
                     }
                     style={styles.nextButton}

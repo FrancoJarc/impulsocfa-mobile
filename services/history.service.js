@@ -26,42 +26,15 @@ export async function getHistoryById(id_historia) {
 }
 
 
-export async function createHistory(historyData) {
+export async function createHistory(formData) {
   const token = await getToken();
   if (!token) throw new Error("No autenticado");
-
-  const formData = new FormData();
-
-  // Campos comunes
-  for (const key in historyData) {
-    if (
-      historyData[key] !== undefined &&
-      historyData[key] !== null &&
-      key !== "archivo1" &&
-      key !== "archivo2" &&
-      key !== "archivo3"
-    ) {
-      formData.append(key, historyData[key]);
-    }
-  }
-
-  // Cargar archivos (si existen)
-  ["archivo1", "archivo2", "archivo3"].forEach((fileKey) => {
-    if (historyData[fileKey]) {
-      formData.append(fileKey, {
-        uri: historyData[fileKey].uri,
-        name: historyData[fileKey].name || `${fileKey}.jpg`,
-        type: historyData[fileKey].type || "image/jpeg",
-      });
-    }
-  });
 
   const res = await fetch(`${API_URL}/`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/json",
-      "Content-Type": "multipart/form-data",
     },
     body: formData,
   });
