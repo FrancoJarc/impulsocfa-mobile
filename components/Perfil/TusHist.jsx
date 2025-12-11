@@ -82,7 +82,7 @@ export default function TusHist() {
           useNativeDriver: true,
         }).start();
       } catch (err) {
-        console.error("Error cargando historias:", err);
+        console.log("Error cargando historias:", err);
       } finally {
         setLoading(false);
       }

@@ -40,7 +40,7 @@ export default function CampaignList() {
 
       setCampaigns(detailed);
     } catch (error) {
-      console.error(error);
+      console.log(error);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -63,7 +63,7 @@ export default function CampaignList() {
 
       loadCampaigns();
     } catch (error) {
-      console.error(error);
+      console.log(error);
       Toast.show({
         type: "error",
         text1: "Error al actualizar la campaña",

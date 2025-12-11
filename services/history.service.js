@@ -113,7 +113,7 @@ export async function getHistoriesByCampaign(id_campana) {
 
     return data;
   } catch (err) {
-    console.error(err);
+    console.log(err);
     return [];
   }
 }

@@ -22,7 +22,9 @@ export default function ReportCampana() {
     try {
       await createReporte({ id_campana: id, motivo });
       Toast.show({ type: "success", text1: "Reporte enviado correctamente" });
-      router.push(`/campanas/${id}`); // navegar de vuelta a la campaña
+      setTimeout(() => {
+        router.back();
+      }, 1200);
     } catch (err) {
       Toast.show({ type: "error", text1: err.message || "No se pudo enviar el reporte" });
     } finally {
@@ -86,21 +88,68 @@ export default function ReportCampana() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: "#F8F5FF", flexGrow: 1 },
+  container: { padding: 16, backgroundColor: "#f3f4f6", flexGrow: 1 },
+
   backText: { color: "#6d28d9", fontWeight: "600", marginBottom: 16 },
-  title: { fontSize: 24, fontWeight: "700", color: "#b91c1c", marginBottom: 4 },
-  subtitle: { fontSize: 16, color: "#444", marginBottom: 12 },
-  alertBox: { backgroundColor: "#fee2e2", padding: 12, borderRadius: 12, marginBottom: 16 },
-  alertText: { color: "#b91c1c", fontSize: 14 },
-  label: { fontWeight: "600", fontSize: 16, marginBottom: 6 },
-  textInput: { backgroundColor: "#fff", borderColor: "#fca5a5", borderWidth: 1, borderRadius: 12, padding: 10, textAlignVertical: "top" },
+
+  title: { fontSize: 24, fontWeight: "700", color: "#6d28d9", marginBottom: 4 },
+
+  subtitle: { fontSize: 16, color: "#374151", marginBottom: 12 },
+
+  alertBox: {
+    backgroundColor: "#e5e7eb",
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: "#6d28d9"
+  },
+
+  alertText: { color: "#374151", fontSize: 14 },
+
+  label: { fontWeight: "600", fontSize: 16, marginBottom: 6, color: "#374151" },
+
+  textInput: {
+    backgroundColor: "#fff",
+    borderColor: "#c4b5fd",
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 10,
+    textAlignVertical: "top"
+  },
+
   charCount: { alignSelf: "flex-end", marginTop: 4, fontSize: 12 },
-  valid: { color: "#16a34a" },
+
+  valid: { color: "#815cbdff" },
   invalid: { color: "#6b7280" },
+
   buttonsRow: { flexDirection: "row", marginTop: 16, gap: 8 },
-  cancelBtn: { flex: 1, backgroundColor: "#e5e7eb", padding: 12, borderRadius: 12, alignItems: "center" },
-  submitBtn: { flex: 1, backgroundColor: "#b91c1c", padding: 12, borderRadius: 12, alignItems: "center" },
+
+  cancelBtn: {
+    flex: 1,
+    backgroundColor: "#434343ff",
+    padding: 12,
+    borderRadius: 12,
+    alignItems: "center"
+  },
+
+  submitBtn: {
+    flex: 1,
+    backgroundColor: "#6d28d9",
+    padding: 12,
+    borderRadius: 12,
+    alignItems: "center"
+  },
+
   disabled: { opacity: 0.5 },
-  btnText: { color: "#fff", fontWeight: "700" },
-  footerText: { marginTop: 24, fontSize: 14, color: "#444", textAlign: "center" },
+
+  btnText: { color: "#ffffffff", fontWeight: "700" },
+
+  footerText: {
+    marginTop: 24,
+    fontSize: 14,
+    color: "#374151",
+    textAlign: "center"
+  },
 });
+

@@ -36,7 +36,7 @@ export default function CategoryList() {
       }));
       setCategories(categoriesWithEdit);
     } catch (error) {
-      console.error(error);
+      console.log(error);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -60,7 +60,7 @@ export default function CategoryList() {
 
       loadCategories();
     } catch (error) {
-      console.error(error);
+      console.log(error);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -99,7 +99,7 @@ export default function CategoryList() {
       });
       loadCategories();
     } catch (error) {
-      console.error(error);
+      console.log(error);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -127,7 +127,7 @@ export default function CategoryList() {
 
       loadCategories();
     } catch (error) {
-      console.error(error);
+      console.log(error);
       Toast.show({
         type: "error",
         text1: "Error",
