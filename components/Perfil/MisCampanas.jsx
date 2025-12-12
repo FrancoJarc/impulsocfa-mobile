@@ -94,7 +94,7 @@ export default function MisCampanas() {
 
         {showButton && (
           <TouchableOpacity
-            onPress={() => router.push(`/perfil/VerMasCampana?id=${c.id_campana}`)}
+            onPress={() => router.push(`/perfilPanel/VerMasCampana?id=${c.id_campana}`)}
             style={{ marginTop: 12 }}
           >
             <Text style={{ color: "#6c47ff", fontWeight: "bold", fontSize: 16 }}>

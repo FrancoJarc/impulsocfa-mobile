@@ -17,7 +17,7 @@ import { Calendar, UserRound, Flag, Camera } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CountryPicker from "react-native-country-picker-modal";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
+import Toast from "react-native-toast-message";
 import {
   updateUserProfile,
   disableUserAccount,
@@ -85,6 +85,24 @@ export default function UserProfileMobile({ navigation }) {
 
   const updateProfile = async () => {
     try {
+      if (!formData.nombre.trim() || !/[a-zA-Z]/.test(formData.nombre)) {
+        Toast.show({
+          type: "error",
+          text1: "Nombre inválido",
+          text2: "Debes ingresar al menos una letra en el nombre.",
+        });
+        return;
+      }
+
+      if (!formData.apellido.trim() || !/[a-zA-Z]/.test(formData.apellido)) {
+        Toast.show({
+          type: "error",
+          text1: "Apellido inválido",
+          text2: "Debes ingresar al menos una letra en el apellido.",
+        });
+        return;
+      }
+
       setSaving(true);
 
       const data = { ...formData };
@@ -93,9 +111,17 @@ export default function UserProfileMobile({ navigation }) {
       const updatedUser = await updateUserProfile(data);
       await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
 
-      Alert.alert("✨ Éxito", "Perfil actualizado correctamente");
+      Toast.show({
+        type: "success",
+        text1: "Perfil actualizado correctamente",
+      });
+
     } catch (err) {
-      Alert.alert("Error", "No se pudo actualizar el perfil");
+      Toast.show({
+        type: "error",
+        text1: "Error al actualizar perfil",
+        text2: "Por favor intentelo devuelta",
+      });
     } finally {
       setSaving(false);
     }
@@ -221,10 +247,22 @@ export default function UserProfileMobile({ navigation }) {
             maximumDate={new Date()}
             onChange={(event, selectedDate) => {
               setShowDatePicker(false);
-              if (selectedDate) {
-                const isoDate = selectedDate.toISOString().split("T")[0];
-                setFormData({ ...formData, fecha_nacimiento: isoDate });
+
+              if (!selectedDate) return;
+
+              const today = new Date();
+
+              if (selectedDate > today) {
+                Toast.show({
+                  type: "error",
+                  text1: "Fecha inválida",
+                  text2: "No puedes seleccionar una fecha de nacimiento futura",
+                });
+                return;
               }
+
+              const isoDate = selectedDate.toISOString().split("T")[0];
+              setFormData({ ...formData, fecha_nacimiento: isoDate });
             }}
           />
         )}
