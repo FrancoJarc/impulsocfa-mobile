@@ -1,20 +1,23 @@
-import { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
+import { useEffect, useState } from "react";
+import { Video } from "expo-av";
 import {
-  View,
+  ActivityIndicator,
+  Image,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Platform,
-  StatusBar,
-  StyleSheet,
+  View,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 import { getUserCampaigns } from "../../services/campaign.service";
 import { createHistory } from "../../services/history.service";
-import Toast from "react-native-toast-message";
 
 export default function FormHistMobile({ onSuccess }) {
   const [form, setForm] = useState({
@@ -31,10 +34,17 @@ export default function FormHistMobile({ onSuccess }) {
     archivo3: null,
   });
 
+
+  const [loadingFiles, setLoadingFiles] = useState({
+    archivo1: false,
+    archivo2: false,
+    archivo3: false,
+  });
+
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // 🔥 NUEVO: cargar campañas automáticamente
+
   useEffect(() => {
     const loadCampaigns = async () => {
       try {
@@ -61,26 +71,48 @@ export default function FormHistMobile({ onSuccess }) {
     setForm({ ...form, [name]: value });
   };
 
-  // 📸 Seleccionar archivo
+
   const pickFile = async (field) => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.8,
-    });
+    try {
+      // Activar spinner
+      setLoadingFiles((prev) => ({ ...prev, [field]: true }));
 
-    if (!result.canceled) {
-      const image = result.assets[0];
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        alert("Necesitas permiso para acceder a la galería.");
+        setLoadingFiles((prev) => ({ ...prev, [field]: false }));
+        return;
+      }
 
-      setFiles({
-        ...files,
-        [field]: {
-          uri: image.uri,
-          name: `${field}_${Date.now()}.jpg`,
-          type: "image/jpeg",
-        },
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: false,
+        quality: 0.8,
       });
+
+      if (!result.assets || !result.assets.length) {
+        setLoadingFiles((prev) => ({ ...prev, [field]: false }));
+        return;
+      }
+
+      const asset = result.assets[0];
+      const isImage = asset.type === "image";
+
+      setFiles((prev) => ({
+        ...prev,
+        [field]: {
+          uri: asset.uri,
+          name: `${field}_${Date.now()}.${isImage ? "jpg" : "mp4"}`,
+          type: isImage ? "image/jpeg" : "video/mp4",
+          isImage,
+        },
+      }));
+      setLoadingFiles((prev) => ({ ...prev, [field]: false }));
+    } catch (error) {
+      console.log("Error seleccionando archivo:", error);
     }
   };
+
 
   // 🚀 Enviar datos
   const handleSubmit = async () => {
@@ -125,7 +157,7 @@ export default function FormHistMobile({ onSuccess }) {
       Toast.show({
         type: "success",
         text1: "Historia subida",
-        text2: "Tu historia se publicó correctamente 💜",
+        text2: "Tu historia se publicó correctamente",
       });
 
     } catch (e) {
@@ -152,7 +184,7 @@ export default function FormHistMobile({ onSuccess }) {
         {/* TÍTULO PRINCIPAL */}
         <Text style={styles.mainTitle}>Crear Historia</Text>
         <Text style={styles.subtitle}>
-          Comparte tu historia de impacto con la comunidad de Impulso CFA :)
+          Comparte tu historia de impacto con la comunidad de Impulso CFA
         </Text>
 
         {/* TÍTULO */}
@@ -224,15 +256,63 @@ export default function FormHistMobile({ onSuccess }) {
           <View style={styles.filesRow}>
             {[1, 2, 3].map((num) => {
               const key = `archivo${num}`;
+              const file = files[key];
+
               return (
                 <TouchableOpacity
                   key={num}
                   style={styles.fileBox}
                   onPress={() => pickFile(key)}
                 >
-                  <Text style={styles.fileText}>
-                    {files[key]?.name || `Archivo ${num}`}
-                  </Text>
+                  {/* LOADER */}
+                  {loadingFiles[key] && (
+                    <ActivityIndicator
+                      size="small"
+                      color="#7c3aed"
+                      style={{ position: "absolute", zIndex: 2 }}
+                    />
+                  )}
+
+                  {/* PREVIEW */}
+                  {file ? (
+                    file.isImage ? (
+                      // 🖼 PREVIEW IMAGEN
+                      <Image
+                        source={{ uri: file.uri }}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: 14,
+                          opacity: loadingFiles[key] ? 0.3 : 1,
+                        }}
+                        resizeMode="cover"
+                        onLoadEnd={() =>
+                          setLoadingFiles((prev) => ({ ...prev, [key]: false }))
+                        }
+                      />
+                    ) : (
+                      // 🎥 PREVIEW VIDEO
+                      <>
+                        {loadingFiles[key] ? null : (
+                          <Video
+                            source={{ uri: file.uri }}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              borderRadius: 14,
+                            }}
+                            resizeMode="cover"
+                            isMuted
+                            shouldPlay={false}
+                          />
+                        )}
+                      </>
+                    )
+                  ) : (
+                    !loadingFiles[key] && (
+                      <Text style={styles.fileText}>Archivo {num}</Text>
+                    )
+                  )}               
                 </TouchableOpacity>
               );
             })}

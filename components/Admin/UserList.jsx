@@ -27,11 +27,6 @@ export default function UserList() {
       const data = await getUsers();
       setUsers(data);
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error al cargar usuarios",
-        text2: "Intentá nuevamente",
-      });
     } finally {
       setLoading(false);
     }
