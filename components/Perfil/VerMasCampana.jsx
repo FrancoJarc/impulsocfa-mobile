@@ -9,15 +9,13 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import { router } from "expo-router";
 import { getCampaignById, suspendCampaign } from "../../services/campaign.service";
 import Toast from "react-native-toast-message";
 import Comments from "../Comentarios/Comments";
 import UltimasDonaciones from "../Campanas/UltimasDonaciones";
 
-export default function VerMasCampana() {
-  const { id } = useLocalSearchParams();
-  const campaignId = id;
+export default function VerMasCampana({ campaignId }) {
 
   const [campana, setCampana] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -27,6 +25,7 @@ export default function VerMasCampana() {
 
   useEffect(() => {
     let mounted = true;
+
     async function fetchData() {
       try {
         setLoading(true);
@@ -50,42 +49,12 @@ export default function VerMasCampana() {
 
     return () => {
       mounted = false;
-      if (carouselRef.current) {
-        clearInterval(carouselRef.current);
-      }
+      if (carouselRef.current) clearInterval(carouselRef.current);
     };
   }, [campaignId]);
 
-  // Carrusel automático
-  useEffect(() => {
-    if (!campana) return;
-    const imagenes = [campana.foto1, campana.foto2, campana.foto3].filter(Boolean);
-    if (imagenes.length <= 1) return;
-
-    carouselRef.current = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % imagenes.length);
-    }, 3000);
-
-    return () => {
-      if (carouselRef.current) clearInterval(carouselRef.current);
-    };
-  }, [campana]);
-
-  const handlePrev = () => {
-    const imagenes = [campana.foto1, campana.foto2, campana.foto3].filter(Boolean);
-    if (!imagenes.length) return;
-    setCurrentImage((prev) => (prev - 1 + imagenes.length) % imagenes.length);
-  };
-
-  const handleNext = () => {
-    const imagenes = [campana.foto1, campana.foto2, campana.foto3].filter(Boolean);
-    if (!imagenes.length) return;
-    setCurrentImage((prev) => (prev + 1) % imagenes.length);
-  };
-
   const handleEdit = () => {
-    // Navegar a editar con query param id
-    router.push(`/perfil/EditarCampana?id=${id}`)
+    router.push(`/perfilPanel/EditarCampana?id=${campaignId}`);
   };
 
   const handleSuspend = () => {
@@ -101,7 +70,7 @@ export default function VerMasCampana() {
             try {
               await suspendCampaign(campana.id_campana);
               Toast.show({ type: "success", text1: "Campaña suspendida" });
-              router.replace("/perfil/MisCampanas");
+              router.replace("/perfilPanel/MisCampanas");
             } catch (e) {
               console.log(e);
               Toast.show({ type: "error", text1: "Error al suspender campaña", text2: e.message });
@@ -112,10 +81,40 @@ export default function VerMasCampana() {
     );
   };
 
+
+  const handlePrev = () => {
+  const imagenes = [campana.foto1, campana.foto2, campana.foto3].filter(Boolean);
+  if (!imagenes.length) return;
+  setCurrentImage((prev) => (prev - 1 + imagenes.length) % imagenes.length);
+};
+
+const handleNext = () => {
+  const imagenes = [campana.foto1, campana.foto2, campana.foto3].filter(Boolean);
+  if (!imagenes.length) return;
+  setCurrentImage((prev) => (prev + 1) % imagenes.length);
+};
+  
   if (loading)
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#7c3aed" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#f5f3ff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#6c47ff" />
+        <Text
+          style={{
+            marginTop: 12,
+            fontSize: 16,
+            color: "#6c47ff",
+            fontWeight: "600",
+          }}
+        >
+          Cargando campaña...
+        </Text>
       </View>
     );
 
@@ -232,7 +231,7 @@ export default function VerMasCampana() {
         <View style={{ padding: 13 }}>
           <Comments id_campana={campaignId} />
 
-          <View style={{ height: 12 }} /> {/* separador */}
+          <View style={{ height: 12 }} /> 
 
           <UltimasDonaciones id_campana={campaignId} />
         </View>

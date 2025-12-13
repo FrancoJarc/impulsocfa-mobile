@@ -20,7 +20,7 @@ export default function UltimasDonaciones({ id_campana }) {
         const data = await getLatestDonations(id_campana);
         setDonaciones(data);
       } catch (error) {
-        alert("No se pudieron cargar las últimas donaciones");
+        console.log("No se pudieron cargar las últimas donaciones");
       } finally {
         setLoading(false);
       }

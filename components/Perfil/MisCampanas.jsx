@@ -86,12 +86,6 @@ export default function MisCampanas() {
           📅 Finaliza: {new Date(c.tiempo_objetivo).toLocaleDateString()}
         </Text>
 
-        {c.estado && (
-          <Text style={{ marginTop: 10, fontWeight: "600" }}>
-            Estado: {c.estado}
-          </Text>
-        )}
-
         {showButton && (
           <TouchableOpacity
             onPress={() => router.push(`/perfilPanel/VerMasCampana?id=${c.id_campana}`)}
