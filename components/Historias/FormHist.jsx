@@ -79,7 +79,7 @@ export default function FormHistMobile({ onSuccess }) {
 
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!perm.granted) {
-        alert("Necesitas permiso para acceder a la galería.");
+        console.log("Necesitas permiso para acceder a la galería.");
         setLoadingFiles((prev) => ({ ...prev, [field]: false }));
         return;
       }

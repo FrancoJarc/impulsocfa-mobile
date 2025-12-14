@@ -29,6 +29,12 @@ export default function EditHist() {
     archivo3: null,
   });
 
+  const [loadingFiles, setLoadingFiles] = useState({
+    archivo1: false,
+    archivo2: false,
+    archivo3: false,
+  });
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -36,9 +42,45 @@ export default function EditHist() {
     const fetchStory = async () => {
       try {
         const data = await getHistoryById(id);
+
         setForm({
           titulo: data.titulo || "",
           contenido: data.contenido || "",
+        });
+
+        setFiles({
+          archivo1: data.archivo1
+            ? {
+              uri: data.archivo1.startsWith("http")
+                ? data.archivo1
+                : `${API_URL}/${data.archivo1}`,
+              name: "archivo1.jpg",
+              type: "image/jpeg",
+              isImage: true,
+            }
+            : null,
+
+          archivo2: data.archivo2
+            ? {
+              uri: data.archivo2.startsWith("http")
+                ? data.archivo2
+                : `${API_URL}/${data.archivo2}`,
+              name: "archivo2.jpg",
+              type: "image/jpeg",
+              isImage: true,
+            }
+            : null,
+
+          archivo3: data.archivo3
+            ? {
+              uri: data.archivo3.startsWith("http")
+                ? data.archivo3
+                : `${API_URL}/${data.archivo3}`,
+              name: "archivo3.jpg",
+              type: "image/jpeg",
+              isImage: true,
+            }
+            : null,
         });
       } catch (err) {
         console.log("Error cargando historia:", err);
@@ -51,13 +93,40 @@ export default function EditHist() {
   }, [id]);
 
   const pickImage = async (field) => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      quality: 0.7,
-    });
+    try {
+      setLoadingFiles((prev) => ({ ...prev, [field]: true }));
 
-    if (!result.canceled) {
-      setFiles((prev) => ({ ...prev, [field]: result.assets[0] }));
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        alert("Necesitas permiso para acceder a la galería.");
+        setLoadingFiles((prev) => ({ ...prev, [field]: false }));
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.8,
+      });
+
+      if (!result.assets || !result.assets.length) {
+        setLoadingFiles((prev) => ({ ...prev, [field]: false }));
+        return;
+      }
+
+      const asset = result.assets[0];
+
+      setFiles((prev) => ({
+        ...prev,
+        [field]: {
+          uri: asset.uri,
+          name: `${field}_${Date.now()}.jpg`,
+          type: "image/jpeg",
+          isImage: true,
+        },
+      }));
+    } catch (e) {
+      console.log("Error seleccionando imagen:", e);
+      setLoadingFiles((prev) => ({ ...prev, [field]: false }));
     }
   };
 
@@ -188,7 +257,8 @@ export default function EditHist() {
       <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 24 }}>
         {[1, 2, 3].map((num) => {
           const key = `archivo${num}`;
-          const img = files[key];
+          const file = files[key];
+
           return (
             <TouchableOpacity
               key={num}
@@ -205,15 +275,36 @@ export default function EditHist() {
                 overflow: "hidden",
               }}
             >
-              <Image
-                source={{
-                  uri: img
-                    ? img.uri
-                    : "https://via.placeholder.com/300x200?text=Sin+Imagen",
-                }}
-                style={{ width: "100%", height: "100%" }}
-                resizeMode="cover"
-              />
+              {/* SPINNER */}
+              {loadingFiles[key] && (
+                <ActivityIndicator
+                  size="small"
+                  color="#7c3aed"
+                  style={{ position: "absolute", zIndex: 2 }}
+                />
+              )}
+
+              {/* PREVIEW */}
+              {file ? (
+                <Image
+                  source={{ uri: file.uri }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    opacity: loadingFiles[key] ? 0.3 : 1,
+                  }}
+                  resizeMode="cover"
+                  onLoadEnd={() =>
+                    setLoadingFiles((prev) => ({ ...prev, [key]: false }))
+                  }
+                />
+              ) : (
+                !loadingFiles[key] && (
+                  <Text style={{ color: "#6b7280", fontSize: 13 }}>
+                    Archivo {num}
+                  </Text>
+                )
+              )}
             </TouchableOpacity>
           );
         })}

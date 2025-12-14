@@ -144,9 +144,7 @@ export default function UserProfileMobile({ navigation }) {
     }
   };
 
-  // -------------------------------
-  // ⬇ UI
-  // -------------------------------
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F5FF" }}>
       <ScrollView
@@ -165,7 +163,6 @@ export default function UserProfileMobile({ navigation }) {
           Mi Perfil
         </Text>
 
-        {/* FOTO DE PERFIL */}
         <View style={{ alignItems: "center", marginBottom: 20 }}>
           <TouchableOpacity onPress={pickImage} style={{ position: "relative" }}>
             <Image
@@ -213,7 +210,6 @@ export default function UserProfileMobile({ navigation }) {
           icon={<UserRound size={20} color="#7c3aed" />}
         />
 
-        {/* FECHA DE NACIMIENTO */}
         <Text style={{ marginBottom: 6, fontWeight: "600", color: "#4b5563" }}>
           Fecha de nacimiento
         </Text>
@@ -221,7 +217,7 @@ export default function UserProfileMobile({ navigation }) {
           style={{
             backgroundColor: "#ede9fe",
             borderRadius: 12,
-            padding: 12,
+            padding: 14,
             borderColor: "#c4b5fd",
             borderWidth: 1,
             flexDirection: "row",
@@ -275,7 +271,7 @@ export default function UserProfileMobile({ navigation }) {
           style={{
             backgroundColor: "#ede9fe",
             borderRadius: 12,
-            padding: 12,
+            padding: 14,
             borderColor: "#c4b5fd",
             borderWidth: 1,
             flexDirection: "row",
@@ -407,30 +403,45 @@ export default function UserProfileMobile({ navigation }) {
   );
 }
 
-// Componente Input reutilizable
+
 function Input({ label, value, onChange, icon }) {
   return (
     <View style={{ marginBottom: 15 }}>
-      <Text style={{ marginBottom: 6, fontWeight: "600", color: "#4b5563", fontSize: 14 }}>
+      <Text
+        style={{
+          marginBottom: 6,
+          fontWeight: "600",
+          color: "#4b5563",
+          fontSize: 14,
+        }}
+      >
         {label}
       </Text>
+
       <View
         style={{
           backgroundColor: "#ede9fe",
           borderRadius: 12,
           paddingHorizontal: 12,
-          paddingVertical: 10,
           borderColor: "#c4b5fd",
           borderWidth: 1,
           flexDirection: "row",
           alignItems: "center",
+          height: 48, // ✅ ALTURA FIJA
         }}
       >
         {icon}
+
         <TextInput
           value={value}
           onChangeText={onChange}
-          style={{ marginLeft: 10, flex: 1, fontSize: 15, color: "#4b5563" }}
+          style={{
+            marginLeft: 10,
+            flex: 1,
+            fontSize: 15,
+            color: "#4b5563",
+            paddingVertical: 0,
+          }}
         />
       </View>
     </View>

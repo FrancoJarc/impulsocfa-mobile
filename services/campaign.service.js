@@ -3,7 +3,6 @@ import { supabase } from '../supabaseClient';
 
 const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/campaigns`;
 
-// 🔹 Helper para obtener el token
 async function getToken() {
     const token = await AsyncStorage.getItem('access_token');
     if (!token) throw new Error('No estás autenticado');
@@ -55,40 +54,20 @@ export async function getCampaignsByCategory(id_categoria, q) {
     return data;
 }
 
-// ✅ Crear campaña
 export async function createCampaign(campaignData) {
     const token = await getToken();
-    const formData = new FormData();
-
-    formData.append('id_categoria', campaignData.id_categoria);
-    formData.append('titulo', campaignData.titulo);
-    formData.append('descripcion', campaignData.descripcion);
-    formData.append('monto_objetivo', campaignData.monto_objetivo);
-    formData.append('tiempo_objetivo', campaignData.tiempo_objetivo);
-    formData.append('alias', campaignData.alias);
-    formData.append('llave_maestra', campaignData.llave_maestra);
-
-    // 📸 Agregar fotos si existen (React Native usa { uri, type, name })
-    ['foto1', 'foto2', 'foto3'].forEach((key) => {
-        if (campaignData[key]) {
-            formData.append(key, {
-                uri: campaignData[key].uri,
-                name: campaignData[key].name || `${key}.jpg`,
-                type: campaignData[key].type || 'image/jpeg',
-            });
-        }
-    });
-
     const res = await fetch(API_URL, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
-        body: formData,
+        body: campaignData,
     });
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Error al crear campaña');
     return data;
 }
+
+
 
 // ✅ Editar campaña
 export async function updateCampaign(id, campaignData) {
@@ -196,7 +175,6 @@ export async function getLatestDonations(id) {
     return data;
 }
 
-// ✅ Donaciones de una campaña específica
 export async function getDonationsByCampaignId(id) {
     const token = await getToken();
 

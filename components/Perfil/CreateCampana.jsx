@@ -6,11 +6,15 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  Image
+  Image,
+  ActivityIndicator,
+  Platform,
+  SafeAreaView,
+  StatusBar,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Picker } from "@react-native-picker/picker";
+// El Picker de react-native-picker ya no se usará.
 
 import { createCampaign } from "../../services/campaign.service";
 import { getCategories } from "../../services/category.service";
@@ -25,33 +29,50 @@ export default function CreateCampana() {
     descripcion: "",
     monto_objetivo: "",
     tiempo_objetivo: "",
-    fotos: [],
   });
 
+  const [files, setFiles] = useState({
+    foto1: null,
+    foto2: null,
+    foto3: null,
+  });
+
+  const [loadingFiles, setLoadingFiles] = useState({
+    foto1: false,
+    foto2: false,
+    foto3: false,
+  });
   const [categorias, setCategorias] = useState([]);
   const [errors, setErrors] = useState({});
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [llaveMaestra, setLlaveMaestra] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false); // Estado para el dropdown de categorías
 
-  /* 🔹 Obtener categorías */
   useEffect(() => {
-    (async () => {
+    const loadCategories = async () => {
       try {
         const data = await getCategories();
-        setCategorias(data);
+        setCategorias(data || []);
       } catch (err) {
-        Toast.show({ type: "error", text1: "Error cargando categorías" });
+        console.log("Error cargando categorías:", err);
       }
-    })();
+    };
+    loadCategories();
   }, []);
 
-  /* 🔹 Validación */
+  const handleChange = (name, value) => {
+    setFormData({ ...formData, [name]: value });
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+  };
+
   const validate = () => {
     const newErrors = {};
 
     if (!formData.titulo.trim())
-      newErrors.titulo = "El nombre es obligatorio.";
+      newErrors.titulo = "El título es obligatorio.";
 
     if (!formData.alias.trim())
       newErrors.alias = "El alias es obligatorio.";
@@ -59,8 +80,9 @@ export default function CreateCampana() {
     if (!formData.descripcion.trim())
       newErrors.descripcion = "La descripción es obligatoria.";
 
-    if (!formData.monto_objetivo || Number(formData.monto_objetivo) <= 0)
-      newErrors.monto_objetivo = "El monto debe ser mayor que 0.";
+    const monto = Number(formData.monto_objetivo.replace(/[^0-9]/g, ""));
+    if (isNaN(monto) || monto <= 0)
+      newErrors.monto_objetivo = "El monto debe ser numérico y mayor que 0.";
 
     if (!formData.tiempo_objetivo)
       newErrors.tiempo_objetivo = "Seleccione una fecha.";
@@ -68,21 +90,55 @@ export default function CreateCampana() {
     if (!formData.id_categoria)
       newErrors.id_categoria = "Debe seleccionar una categoría.";
 
+    if (!files.foto1)
+      newErrors.fotos = "Debes subir al menos una foto.";
+
     return newErrors;
   };
 
-  /* 🔹 Seleccionar imágenes */
-  const pickImages = async () => {
-    const res = await ImagePicker.launchImageLibraryAsync({
-      allowsMultipleSelection: true,
-      quality: 0.8,
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      selectionLimit: 3,
-    });
+  const pickImage = async (field) => {
+    try {
+      setLoadingFiles((prev) => ({ ...prev, [field]: true }));
 
-    if (!res.canceled) {
-      const selected = res.assets.slice(0, 3);
-      setFormData((prev) => ({ ...prev, fotos: selected }));
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        Toast.show({ type: "error", text1: "Permiso denegado" });
+        setLoadingFiles((prev) => ({ ...prev, [field]: false }));
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Solo imágenes
+        quality: 0.8,
+      });
+
+      if (!result.assets || !result.assets.length) {
+        setLoadingFiles((prev) => ({ ...prev, [field]: false }));
+        return;
+      }
+
+      const asset = result.assets[0];
+
+      setFiles((prev) => ({
+        ...prev,
+        [field]: {
+          uri: asset.uri,
+          name: `${field}_${Date.now()}.jpg`,
+          type: "image/jpeg",
+        },
+      }));
+      setLoadingFiles((prev) => ({ ...prev, [field]: false }));
+
+    } catch (error) {
+      console.log("Error seleccionando imagen:", error);
+      setLoadingFiles((prev) => ({ ...prev, [field]: false }));
+    }
+  };
+
+  const handleDateChange = (event, selected) => {
+    setDatePickerVisible(false);
+    if (selected) {
+      handleChange("tiempo_objetivo", selected.toISOString().split("T")[0]);
     }
   };
 
@@ -91,7 +147,7 @@ export default function CreateCampana() {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      Toast.show({ type: "error", text1: "Corrige los errores." });
+      Toast.show({ type: "error", text1: "Completa todos los campos obligatorios." });
       return;
     }
 
@@ -103,34 +159,34 @@ export default function CreateCampana() {
     setLoading(true);
 
     try {
-      // Crear FormData
       const data = new FormData();
       data.append("id_categoria", formData.id_categoria);
       data.append("alias", formData.alias);
       data.append("titulo", formData.titulo);
       data.append("descripcion", formData.descripcion);
-      data.append("monto_objetivo", formData.monto_objetivo.replace(/\./g, ""));
+      const montoSinFormato = formData.monto_objetivo.replace(/[^0-9]/g, "");
+      data.append("monto_objetivo", montoSinFormato);
       data.append("tiempo_objetivo", formData.tiempo_objetivo);
       data.append("llave_maestra", llaveMaestra);
 
-      formData.fotos.forEach((img, index) => {
-        data.append(`foto${index + 1}`, {
-          uri: img.uri,
-          type: "image/jpeg",
-          name: `foto${index + 1}.jpg`,
-        });
+      // Adjuntar archivos de fotos
+      Object.entries(files).forEach(([key, file]) => {
+        if (file) {
+          data.append(key, file);
+        }
       });
 
       await createCampaign(data);
 
-      Toast.show({ type: "success", text1: "Campaña creada con éxito" });
-      router.push("/perfil/MisCampanas");
+      Toast.show({ type: "success", text1: "Campaña creada con éxito", text2: "La campaña será visible cuando un administrador la acepte." });
+      router.replace("/perfilPanel/MisCampanas");
 
     } catch (error) {
+      console.log("Error al crear campaña:", error);
       Toast.show({
         type: "error",
         text1: "Error al crear campaña",
-        text2: error.message,
+        text2: error.message || "Ocurrió un problema.",
       });
     } finally {
       setLoading(false);
@@ -138,231 +194,357 @@ export default function CreateCampana() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Crear campaña</Text>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+      }}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* TÍTULO PRINCIPAL */}
+        <Text style={styles.mainTitle}>Crear Campaña</Text>
+        <Text style={styles.subtitle}>
+          Inicia tu campaña para recaudar fondos y hacer un cambio.
+        </Text>
 
         {/* 🔑 Llave maestra */}
-        <Text style={styles.label}>Llave maestra</Text>
-        <TextInput
-          value={llaveMaestra}
-          secureTextEntry
-          placeholder="Tu llave maestra"
-          onChangeText={setLlaveMaestra}
-          style={styles.input}
-        />
-
-        {/* Categorías */}
-        <Text style={styles.label}>Categoría</Text>
-        <View style={styles.pickerBox}>
-          <Picker
-            selectedValue={formData.id_categoria}
-            onValueChange={(value) =>
-              setFormData({ ...formData, id_categoria: value })
-            }
-          >
-            <Picker.Item label="Selecciona una categoría" value="" />
-            {categorias.map((c) => (
-              <Picker.Item
-                key={c.id_categoria}
-                label={c.nombre}
-                value={c.id_categoria}
-              />
-            ))}
-          </Picker>
+        <View style={styles.block}>
+          <Text style={styles.label}>Llave maestra *</Text>
+          <TextInput
+            value={llaveMaestra}
+            secureTextEntry
+            placeholder="Tu llave maestra"
+            onChangeText={setLlaveMaestra}
+            style={styles.input}
+            placeholderTextColor="#9ca3af"
+          />
         </View>
-        {errors.id_categoria && <Text style={styles.error}>{errors.id_categoria}</Text>}
 
-        {/* Nombre */}
-        <Text style={styles.label}>Nombre</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej: Ayuda a Bahía Blanca"
-          onChangeText={(t) => setFormData({ ...formData, titulo: t })}
-        />
-        {errors.titulo && <Text style={styles.error}>{errors.titulo}</Text>}
+        {/* Categorías (Dropdown) */}
+        <View style={styles.block}>
+          <Text style={styles.label}>Categoría *</Text>
+          <TouchableOpacity
+            style={styles.selectBox}
+            onPress={() => setShowDropdown((prev) => !prev)}
+          >
+            <Text style={styles.selectText}>
+              {formData.id_categoria
+                ? categorias.find((c) => c.id_categoria === formData.id_categoria)?.nombre
+                : "Seleccionar categoría..."}
+            </Text>
+          </TouchableOpacity>
+
+          {showDropdown && categorias.length > 0 && (
+            <View style={styles.dropdown}>
+              {categorias.map((c) => (
+                <TouchableOpacity
+                  key={c.id_categoria}
+                  style={styles.optionBox}
+                  onPress={() => {
+                    handleChange("id_categoria", c.id_categoria);
+                    setShowDropdown(false);
+                  }}
+                >
+                  <Text style={styles.option}>{c.nombre}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+          {errors.id_categoria && <Text style={styles.error}>{errors.id_categoria}</Text>}
+        </View>
+
+        {/* Título */}
+        <View style={styles.block}>
+          <Text style={styles.label}>Título *</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.titulo}
+            placeholder="Ej: Ayuda a Bahía Blanca"
+            onChangeText={(t) => handleChange("titulo", t)}
+            placeholderTextColor="#9ca3af"
+          />
+          {errors.titulo && <Text style={styles.error}>{errors.titulo}</Text>}
+        </View>
 
         {/* Alias */}
-        <Text style={styles.label}>Alias</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="ayuda-bahia"
-          onChangeText={(t) => setFormData({ ...formData, alias: t })}
-        />
-        {errors.alias && <Text style={styles.error}>{errors.alias}</Text>}
+        <View style={styles.block}>
+          <Text style={styles.label}>Alias *</Text>
+          <TextInput
+            style={styles.input}
+            value={formData.alias}
+            placeholder="ayuda-bahia (sin espacios)"
+            onChangeText={(t) => handleChange("alias", t)}
+            placeholderTextColor="#9ca3af"
+          />
+          {errors.alias && <Text style={styles.error}>{errors.alias}</Text>}
+        </View>
 
         {/* Descripción */}
-        <Text style={styles.label}>Descripción</Text>
-        <TextInput
-          style={[styles.input, { height: 100 }]}
-          multiline
-          onChangeText={(t) => setFormData({ ...formData, descripcion: t })}
-        />
-        {errors.descripcion && <Text style={styles.error}>{errors.descripcion}</Text>}
+        <View style={styles.block}>
+          <Text style={styles.label}>Descripción *</Text>
+          <TextInput
+            style={[styles.input, styles.textarea]}
+            value={formData.descripcion}
+            multiline
+            onChangeText={(t) => handleChange("descripcion", t)}
+            placeholder="Describe tu campaña y la necesidad..."
+            placeholderTextColor="#9ca3af"
+          />
+          {errors.descripcion && <Text style={styles.error}>{errors.descripcion}</Text>}
+        </View>
 
         {/* Monto */}
-        <Text style={styles.label}>Monto objetivo</Text>
-        <TextInput
-          keyboardType="numeric"
-          style={styles.input}
-          placeholder="Ej: 100000"
-          value={formData.monto_objetivo}
-          onChangeText={(t) => setFormData({ ...formData, monto_objetivo: t })}
-        />
-        {errors.monto_objetivo && <Text style={styles.error}>{errors.monto_objetivo}</Text>}
+        <View style={styles.block}>
+          <Text style={styles.label}>Monto objetivo *</Text>
+          <TextInput
+            keyboardType="numeric"
+            style={styles.input}
+            value={formData.monto_objetivo}
+            placeholder="Ej: 100000"
+            onChangeText={(t) => handleChange("monto_objetivo", t)}
+            placeholderTextColor="#9ca3af"
+          />
+          {errors.monto_objetivo && <Text style={styles.error}>{errors.monto_objetivo}</Text>}
+        </View>
 
         {/* Fecha */}
-        <Text style={styles.label}>Fecha de finalización</Text>
-        <TouchableOpacity
-          style={styles.dateButton}
-          onPress={() => setDatePickerVisible(true)}
-        >
-          <Text style={{ color: "#807d85ff", fontWeight: "400" }}>
-            {formData.tiempo_objetivo || "Seleccionar fecha"}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.block}>
+          <Text style={styles.label}>Fecha de finalización *</Text>
+          <TouchableOpacity
+            style={styles.selectBox}
+            onPress={() => setDatePickerVisible(true)}
+          >
+            <Text style={styles.selectText}>
+              {formData.tiempo_objetivo || "Seleccionar fecha"}
+            </Text>
+          </TouchableOpacity>
 
-        {datePickerVisible && (
-          <DateTimePicker
-            value={new Date()}
-            mode="date"
-            onChange={(e, selected) => {
-              setDatePickerVisible(false);
-              if (selected) {
-                setFormData({
-                  ...formData,
-                  tiempo_objetivo: selected.toISOString().split("T")[0],
-                });
-              }
-            }}
-          />
-        )}
-
-        {/* Imágenes */}
-        <Text style={styles.label}>Imágenes (máximo 3)</Text>
-        <TouchableOpacity style={styles.imageButton} onPress={pickImages}>
-          <Text style={{ color: "white", fontWeight: "bold" }}>
-            Seleccionar imágenes
-          </Text>
-        </TouchableOpacity>
-
-        <View style={styles.previewContainer}>
-          {formData.fotos.map((foto, idx) => (
-            <Image
-              key={idx}
-              source={{ uri: foto.uri }}
-              style={styles.preview}
+          {datePickerVisible && (
+            <DateTimePicker
+              value={new Date()}
+              mode="date"
+              minimumDate={new Date()}
+              onChange={handleDateChange}
             />
-          ))}
+          )}
+          {errors.tiempo_objetivo && <Text style={styles.error}>{errors.tiempo_objetivo}</Text>}
+        </View>
+
+        {/* IMÁGENES */}
+        <View style={styles.fileContainer}>
+          <Text style={styles.label}>Imágenes (Mínimo 1 foto)</Text>
+
+          <View style={styles.filesRow}>
+            {[1, 2, 3].map((num) => {
+              const key = `foto${num}`;
+              const file = files[key];
+
+              return (
+                <TouchableOpacity
+                  key={num}
+                  style={styles.fileBox}
+                  onPress={() => pickImage(key)}
+                  disabled={loadingFiles[key]}
+                >
+                  {/* LOADER */}
+                  {loadingFiles[key] && (
+                    <ActivityIndicator
+                      size="small"
+                      color="#7c3aed"
+                      style={{ position: "absolute", zIndex: 2 }}
+                    />
+                  )}
+
+                  {/* PREVIEW */}
+                  {file ? (
+                    <Image
+                      source={{ uri: file.uri }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: 14,
+                        opacity: loadingFiles[key] ? 0.3 : 1,
+                      }}
+                      resizeMode="cover"
+                      onLoadStart={() => setLoadingFiles((prev) => ({ ...prev, [key]: true }))}
+                      onLoadEnd={() => setLoadingFiles((prev) => ({ ...prev, [key]: false }))}
+                    />
+                  ) : (
+                    !loadingFiles[key] && (
+                      <Text style={styles.fileText}>Foto {num}</Text>
+                    )
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          {errors.fotos && <Text style={styles.error}>{errors.fotos}</Text>}
         </View>
 
         {/* Botón Crear */}
         <TouchableOpacity
-          style={styles.submit}
+          style={styles.btn}
           onPress={handleSubmit}
           disabled={loading}
         >
-          <Text style={styles.submitText}>
+          <Text style={styles.btnText}>
             {loading ? "Creando..." : "Crear campaña"}
           </Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+
+        {/* FOOTER */}
+        <Text style={styles.footerText}>
+          Asegúrate de que la información sea correcta antes de publicar.
+        </Text>
+
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
-/* 🟣 Estilos violetas */
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#F8F5FF",
-  },
-  card: {
-    backgroundColor: "white",
-    margin: 20,
     padding: 20,
-    borderRadius: 20,
-    shadowColor: "#8b5cf6",
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: "#e0e7ff",
+    paddingTop: 40,
+    flexGrow: 1,
+    backgroundColor: "#f5f3ff", // Color de fondo consistente
   },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
+
+  mainTitle: {
+    fontSize: 34,
+    fontWeight: "800",
     color: "#6d28d9",
+    marginBottom: 4,
   },
+
+  subtitle: {
+    fontSize: 15,
+    color: "#4b5563",
+    marginBottom: 30,
+  },
+
+  block: {
+    marginBottom: 25,
+  },
+
   label: {
     fontSize: 16,
-    fontWeight: "600",
-    color: "#4c1d95",
-    marginBottom: 6,
+    fontWeight: "700",
+    color: "#1f2937",
+    marginBottom: 8,
   },
+
   input: {
-    backgroundColor: "#f5f3ff",
-    borderWidth: 1,
-    borderColor: "#dcd4ff",
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 10,
-    color: "#4c1d95",
-  },
-  error: { color: "#b91c1c", marginBottom: 10 },
-
-  pickerBox: {
-    backgroundColor: "#f5f3ff",
-    borderWidth: 1,
-    borderColor: "#dcd4ff",
-    borderRadius: 12,
-    marginBottom: 10,
-  },
-
-  dateButton: {
-    backgroundColor: "#f5f3ff",
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#dcd4ff",
-    marginBottom: 10,
-  },
-
-  imageButton: {
-    backgroundColor: "#8b5cf6",
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 10,
-    alignItems: "center",
-  },
-
-  previewContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginBottom: 20,
-  },
-
-  preview: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-  },
-
-  submit: {
-    backgroundColor: "#7c3aed",
+    backgroundColor: "white",
+    borderWidth: 2,
+    borderColor: "#ddd6fe",
+    borderRadius: 16,
     padding: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    shadowColor: "#8b5cf6",
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 4 },
+    fontSize: 15,
+    color: "#374151",
   },
-  submitText: {
+
+  textarea: {
+    minHeight: 130,
+    textAlignVertical: "top",
+  },
+
+  selectBox: {
+    backgroundColor: "white",
+    borderWidth: 2,
+    borderColor: "#ddd6fe",
+    borderRadius: 16,
+    padding: 14,
+  },
+
+  selectText: {
+    fontSize: 15,
+    color: "#374151",
+  },
+
+  option: {
+    paddingVertical: 8,
+    fontSize: 15,
+    color: "#6b21a8",
+  },
+
+  fileContainer: {
+    marginBottom: 25,
+    backgroundColor: "#ede9fe", // Fondo más claro para la sección de archivos
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#c4b5fd",
+  },
+
+  filesRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 12,
+  },
+
+  fileBox: {
+    width: "30%",
+    height: 90,
+    backgroundColor: "white",
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: "#ddd6fe",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  fileText: {
+    fontSize: 13,
+    textAlign: "center",
+    color: "#6b7280",
+  },
+
+  btn: {
+    backgroundColor: "#7c3aed",
+    padding: 16,
+    borderRadius: 18,
+    marginTop: 10,
+    // Eliminado shadow para consistencia con FormHistMobile
+  },
+
+  btnText: {
     color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 17,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+
+  footerText: {
+    textAlign: "center",
+    fontSize: 13,
+    color: "#6b7280",
+    marginTop: 20,
+    marginBottom: 60,
+  },
+
+  dropdown: {
+    backgroundColor: "white",
+    borderWidth: 2,
+    borderColor: "#ddd6fe",
+    borderRadius: 16,
+    marginTop: 6,
+    paddingVertical: 4,
+    position: "absolute", // Posicionar sobre el contenido
+    top: "100%", // Debajo del selectBox
+    width: "100%",
+    zIndex: 10, // Asegurar que esté por encima de otros elementos
+  },
+
+  optionBox: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+
+  error: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#b91c1c", // Color de error rojo fuerte
+    fontWeight: "500",
   },
 });
