@@ -61,7 +61,7 @@ export default function CreateAdminForm() {
       Toast.show({
         type: "error",
         text1: "Error al crear administrador",
-        text2: error.message || "Intentalo nuevamente",
+        text2: "Intentalo nuevamente",
       });
     } finally {
       setLoading(false);

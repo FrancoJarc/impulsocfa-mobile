@@ -49,11 +49,22 @@ export default function RegistrarseForm() {
     };
 
     const handleSubmit = async () => {
-        if (!formData.email || !formData.password || !formData.nombre || !formData.apellido) {
+        if (!formData.email || !formData.password || !formData.nombre || !formData.apellido || !formData.fecha_nacimiento || !formData.nacionalidad) {
             Toast.show({
                 type: 'error',
                 text1: 'Campos incompletos',
                 text2: 'Por favor completa todos los campos obligatorios.',
+                position: 'top',
+            });
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            Toast.show({
+                type: 'error',
+                text1: 'Email inválido',
+                text2: 'Ingresa un correo electrónico válido.',
                 position: 'top',
             });
             return;
@@ -65,13 +76,12 @@ export default function RegistrarseForm() {
 
             Toast.show({
                 type: 'success',
-                text1: '¡Registro exitoso! 🎉',
+                text1: '¡Registro exitoso!',
                 text2: 'Revisa tu correo para confirmar tu cuenta.',
                 position: 'top',
                 visibilityTime: 6000, // Lo muestro un poco más de tiempo.
             });
 
-            // Limpiar formulario
             setFormData({
                 email: "",
                 password: "",

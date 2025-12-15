@@ -40,7 +40,7 @@ export default function UserList() {
       Toast.show({
         type: "success",
         text1: "Estado actualizado",
-        text2: `El usuario ahora está: "${newState}".`,
+        text2: `Se actualizo el estado del usuario.`,
       });
 
       loadUsers();
