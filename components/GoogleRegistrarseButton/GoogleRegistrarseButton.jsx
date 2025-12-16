@@ -1,55 +1,58 @@
-import React, { useState } from "react";
-import Toast from 'react-native-toast-message';
-import { TouchableOpacity, Text, StyleSheet, View, ActivityIndicator } from "react-native";
-import { supabase } from "../../supabaseClient";
+import React, { useEffect, useState } from "react";
+import { TouchableOpacity, Text, View,StyleSheet, ActivityIndicator } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import * as AuthSession from "expo-auth-session";
-import Constants from "expo-constants";
-import * as WebBrowser from "expo-web-browser";
-
-WebBrowser.maybeCompleteAuthSession();
+import Toast from "react-native-toast-message";
+import { supabase } from "../../supabaseClient";
+import { googleCallbackMobile } from "../../services/auth.service";
+import { useRouter } from "expo-router";
 
 export default function GoogleRegistrarseButton() {
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
+    useEffect(() => {
+        const { data: { subscription } } =
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === "SIGNED_IN" && session) {
+                    try {
+                        await googleCallbackMobile(session.access_token);
+
+                        Toast.show({
+                            type: "success",
+                            text1: "Sesión iniciada con Google",
+                        });
+
+                        router.replace("/(tabs)");
+                    } catch (err) {
+                        setLoading(false);
+                        Toast.show({
+                            type: "error",
+                            text1: "Error al validar usuario",
+                            text2: err.message,
+                        });
+                    }
+                }
+            });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     const loginWithGoogle = async () => {
-        setLoading(true);
-
-        Toast.show({
-            type: 'info',
-            text1: 'No disponible',
-            text2: 'Esta función estará disponible proximamente.',
-            position: 'top',
-        });
-        /*
-        Toast.show({
-            type: 'info',
-            text1: 'Redirigiendo...',
-            text2: 'Abriendo Google para iniciar sesión.',
-            position: 'top',
-        });*/
-
         try {
-            const redirectTo = AuthSession.makeRedirectUri({
-                useProxy: process.env.NODE_ENV !== "production",
-                scheme: "impulsocfamobile",
-                path: "auth"
-            });
+            setLoading(true);
 
-            console.log("Redirect URI en uso:", redirectTo);
-
-            const { data, error } = await supabase.auth.signInWithOAuth({
+            const { error } = await supabase.auth.signInWithOAuth({
                 provider: "google",
-                options: { redirectTo }
             });
 
-            if (error) console.log("ERROR OAuth:", error);
-
+            if (error) throw error;
         } catch (err) {
-            console.log("Error general OAuth:", err);
-        } finally {
             setLoading(false);
+            Toast.show({
+                type: "error",
+                text1: "Error con Google",
+                text2: err.message,
+            });
         }
     };
 
@@ -58,46 +61,59 @@ export default function GoogleRegistrarseButton() {
             onPress={loginWithGoogle}
             style={[styles.button, loading && { opacity: 0.7 }]}
             disabled={loading}
+            activeOpacity={0.8}
         >
-            {loading ? (
-                <ActivityIndicator color="#4285F4" />
-            ) : (
-                <>
-                    <MaterialCommunityIcons name="google" size={24} color="#4285F4" />
-                    <Text style={styles.buttonText}>
-                        Continuar con <Text style={styles.googleText}>Google</Text>
-                    </Text>
-                </>
+            <View
+                style={[
+                    styles.content,
+                    loading && { opacity: 0 }
+                ]}
+            >
+                <MaterialCommunityIcons name="google" size={24} color="#4285F4" />
+                <Text style={styles.text}>
+                    Continuar con <Text style={styles.google}>Google</Text>
+                </Text>
+            </View>
+
+            {loading && (
+                <ActivityIndicator
+                    size="small"
+                    color="#4285F4"
+                    style={styles.spinner}
+                />
             )}
         </TouchableOpacity>
     );
 }
 
+
 const styles = StyleSheet.create({
     button: {
-        width: "100%",
         flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 12,
         padding: 14,
-        backgroundColor: "#ffffff",
         borderRadius: 10,
+        backgroundColor: "#fff",
+        justifyContent: "center",
+        alignItems: "center",
         borderWidth: 1,
         borderColor: "#e0e0e0",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-        elevation: 3,
+        position: "relative", // 👈 CLAVE
     },
-    buttonText: {
-        color: "#1e1e2f",
+    content: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 12,
+    },
+    spinner: {
+        position: "absolute",
+    },
+    text: {
         fontSize: 16,
         fontWeight: "600",
+        color: "#1e1e2f",
     },
-    googleText: {
+    google: {
+        color: "#4285F4",
         fontWeight: "bold",
-        color: "#4285F4", 
-    }
+    },
 });
