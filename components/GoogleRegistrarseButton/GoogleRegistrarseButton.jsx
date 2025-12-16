@@ -5,6 +5,10 @@ import Toast from "react-native-toast-message";
 import { supabase } from "../../supabaseClient";
 import { googleCallbackMobile } from "../../services/auth.service";
 import { useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleRegistrarseButton() {
     const [loading, setLoading] = useState(false);
@@ -41,17 +45,33 @@ export default function GoogleRegistrarseButton() {
         try {
             setLoading(true);
 
-            const { error } = await supabase.auth.signInWithOAuth({
+            const redirectTo = AuthSession.makeRedirectUri({
+                scheme: "impulsocfamobile",
+                path: "auth",
+            });
+
+            const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: "google",
+                options: {
+                    redirectTo,
+                    skipBrowserRedirect: true,
+                },
             });
 
             if (error) throw error;
+
+            // 🔥 ACÁ estaba el problema: data ahora sí existe
+            await WebBrowser.openAuthSessionAsync(
+                data.url,
+                redirectTo
+            );
+
         } catch (err) {
+            console.log(err);
             setLoading(false);
             Toast.show({
                 type: "error",
                 text1: "Error con Google",
-                text2: err.message,
             });
         }
     };
