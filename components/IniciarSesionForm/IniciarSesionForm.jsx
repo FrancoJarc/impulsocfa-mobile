@@ -8,13 +8,12 @@ import {
     TouchableOpacity,
     StyleSheet,
     ActivityIndicator,
-    ScrollView, 
+    ScrollView,
 } from "react-native";
 import { login } from "../../services/auth.service";
-import GoogleRegistrarseButton from "../GoogleRegistrarseButton/GoogleRegistrarseButton";
 
 export default function IniciarSesionForm() {
-    const router = useRouter(); 
+    const router = useRouter();
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -25,7 +24,7 @@ export default function IniciarSesionForm() {
         setFormData({ ...formData, [key]: value });
     };
 
-    const handleSubmit = async () => { 
+    const handleSubmit = async () => {
         setLoading(true);
 
         if (!formData.email || !formData.password) {
@@ -38,30 +37,14 @@ export default function IniciarSesionForm() {
             return;
         }
 
-
-        const toastId = Toast.show({
-            type: 'info', 
-            text1: "Verificando credenciales...",
-            text2: "Iniciando sesión.",
-            position: 'top',
-            autoHide: false, 
-            visibilityTime: 99999, 
-        });
-
         try {
-            const data = await login(formData.email, formData.password);
-            Toast.hide(toastId);
-            setTimeout(() => router.replace("/(tabs)"), 800);
-
+            await login(formData.email, formData.password);
+            router.replace("/(tabs)");
         } catch (error) {
-            console.log("Error al iniciar sesión:", error.message);
-
-            Toast.hide(toastId);
             Toast.show({
                 type: 'error',
-                text1: "Error al iniciar sesión 😕",
-                text2: "Verificá tus datos o la conexión.",
-                visibilityTime: 4000,
+                text1: "Error al iniciar sesión",
+                text2: "Verificá tus datos.",
             });
         } finally {
             setLoading(false);
@@ -69,28 +52,28 @@ export default function IniciarSesionForm() {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
             <View style={styles.card}>
                 <Text style={styles.title}>Iniciar Sesión</Text>
 
                 <View style={styles.form}>
                     <TextInput
-                        required
                         keyboardType="email-address"
                         autoCapitalize="none"
-                        name="email"
                         placeholder="E-mail"
+                        multiline={false}
+                        numberOfLines={1}
+                        scrollEnabled={true}
                         placeholderTextColor="#6b7280"
                         value={formData.email}
                         onChangeText={(v) => handleChange("email", v)}
                         style={styles.input}
                     />
 
-
                     <TextInput
-                        required
                         secureTextEntry
-                        name="password"
+                        multiline={false}
+                        numberOfLines={1}
+                        scrollEnabled={true}
                         placeholder="Contraseña"
                         placeholderTextColor="#6b7280"
                         value={formData.password}
@@ -99,16 +82,19 @@ export default function IniciarSesionForm() {
                     />
 
                     <View style={styles.forgotPasswordContainer}>
-                        <Link href="/(auth)/recuperarcontrasenia" style={styles.forgotPasswordLink}>
+                        <Link
+                            href="/(auth)/recuperarcontrasenia"
+                            style={styles.forgotPasswordLink}
+                        >
                             ¿Olvidaste tu contraseña?
                         </Link>
                     </View>
-
 
                     <TouchableOpacity
                         onPress={handleSubmit}
                         style={[styles.button, loading && styles.buttonDisabled]}
                         disabled={loading}
+                        activeOpacity={0.85}
                     >
                         {loading ? (
                             <ActivityIndicator color="#fff" />
@@ -118,19 +104,6 @@ export default function IniciarSesionForm() {
                     </TouchableOpacity>
                 </View>
 
-                
-                <View style={styles.separatorContainer}>
-                    <View style={styles.separatorLine} />
-                    <Text style={styles.separatorText}>O continúa con</Text>
-                    <View style={styles.separatorLine} />
-                </View>
-
-
-                <View style={styles.googleButtonWrapper}>
-                    <GoogleRegistrarseButton />
-                </View>
-
-
                 <View style={styles.registerContainer}>
                     <Text style={styles.registerText}>¿No tenés cuenta? </Text>
                     <Link href="/(auth)/registrarse" style={styles.registerLink}>
@@ -138,110 +111,105 @@ export default function IniciarSesionForm() {
                     </Link>
                 </View>
             </View>
-        </ScrollView>
     );
 }
+
 const styles = StyleSheet.create({
     scrollContainer: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 0,
+        width: "100%",
+        alignItems: "center",
     },
+
+    // ⬅️ MÁS GRANDE
     card: {
         width: "100%",
-        backgroundColor: "rgba(255, 255, 255, 0.9)",
-        borderRadius: 20,
-        padding: 35,
+        maxWidth: 460,
+        alignSelf: "center",
+        backgroundColor: "rgba(255,255,255,0.95)",
+        borderRadius: 24,
+        padding: 40,
         shadowColor: "#8b5cf6",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-        elevation: 5,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.25,
+        shadowRadius: 12,
+        elevation: 6,
         borderWidth: 1,
-        borderColor: '#e0e7ff',
+        borderColor: "#e0e7ff",
     },
+
     title: {
-        fontSize: 28,
+        fontSize: 30,
         fontWeight: "bold",
         textAlign: "center",
-        marginBottom: 30,
+        marginBottom: 32,
         color: "#6d28d9",
     },
+
     form: {
-        gap: 20,
+        gap: 24,
     },
+
     input: {
         width: "100%",
+        maxWidth: "100%",
         backgroundColor: "#f5f3ff",
         borderColor: "#c4b5fd",
         borderWidth: 1,
-        borderRadius: 10,
-        padding: 14,
+        borderRadius: 14,
+        paddingVertical: 16,
+        paddingHorizontal: 18,
         color: "#1e1e2f",
-        fontSize: 16,
+        fontSize: 17,
     },
+
     forgotPasswordContainer: {
-        width: "100%",       
-        alignItems: "center", 
-        marginTop: 10, 
+        alignItems: "center",
+        marginTop: 6,
     },
+
     forgotPasswordLink: {
         color: "#7c3aed",
-        fontSize: 14,
-        textDecorationLine: 'underline',
-        alignSelf: "center",
+        fontSize: 15,
+        textDecorationLine: "underline",
     },
+
     button: {
-        marginTop: 10,
-        backgroundColor: "#a78bfa",
-        padding: 14,
-        borderRadius: 10,
+        marginTop: 12,
+        backgroundColor: "#7c3aed",
+        paddingVertical: 14,
+        borderRadius: 14,
         alignItems: "center",
         shadowColor: "#8b5cf6",
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.4,
-        shadowRadius: 5,
+        shadowOpacity: 0.35,
+        shadowRadius: 6,
         elevation: 5,
     },
+
     buttonDisabled: {
         opacity: 0.6,
     },
+
     buttonText: {
         color: "#fff",
         fontWeight: "bold",
         fontSize: 18,
     },
-    separatorContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginVertical: 25,
-    },
-    separatorLine: {
-        flex: 1,
-        height: 1,
-        backgroundColor: "#e0e7ff",
-    },
-    separatorText: {
-        marginHorizontal: 15,
-        color: "#6b7280",
-        fontSize: 14,
-    },
-    googleButtonWrapper: {
-        marginBottom: 20,
-    },
+
     registerContainer: {
         flexDirection: "row",
         justifyContent: "center",
-        marginTop: 10,
+        marginTop: 22,
     },
+
     registerText: {
         color: "#555",
-        fontSize: 14,
+        fontSize: 15,
     },
+
     registerLink: {
         color: "#7c3aed",
         fontWeight: "bold",
-        fontSize: 14,
+        fontSize: 15,
     },
 });

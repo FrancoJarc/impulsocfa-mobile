@@ -22,18 +22,20 @@ export default function Registrarse() {
                 {/* Formulario de registro */}
                 <RegistrarseForm />
 
-                {/* Separador */}
+                {/*
+       
                 <View style={styles.separatorContainer}>
                     <View style={styles.separatorLine} />
                     <Text style={styles.separatorText}>O continúa con</Text>
                     <View style={styles.separatorLine} />
                 </View>
 
-                {/* Botón Google */}
+
                 <View style={{ marginTop: 16 }}>
                     <GoogleRegistrarseButton />
                 </View>
-
+                */}
+            
                 {/* Link a inicio de sesión */}
                 <View style={styles.loginContainer}>
                     <Text style={styles.loginText}>¿Ya tenés cuenta? </Text>
