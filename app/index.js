@@ -1,33 +1,35 @@
 import { useEffect, useState } from "react";
-import { Redirect, SplashScreen } from "expo-router";
+import { SplashScreen, useRouter } from "expo-router";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 import { checkSession } from "../services/auth.service";
 
-// Evita que el splash screen se oculte antes de cargar el estado de la sesión
 SplashScreen.preventAutoHideAsync();
 
 export default function IndexScreen() {
-    const [isAuth, setIsAuth] = useState(false);
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         async function loadSession() {
             try {
                 const hasSession = await checkSession();
-                setIsAuth(hasSession);
+
+                if (hasSession) {
+                    router.replace("/(tabs)");
+                } else {
+                    router.replace("/(auth)/iniciarsesion");
+                }
             } catch (error) {
-                console.log("Error al cargar la sesión:", error);
-                setIsAuth(false);
+                router.replace("/(auth)/iniciarsesion");
             } finally {
                 setIsLoading(false);
-                SplashScreen.hideAsync(); // Ocultar splash al tener el estado de sesión
+                SplashScreen.hideAsync();
             }
         }
 
         loadSession();
     }, []);
 
-    // 1. Mostrar pantalla de carga mientras se verifica el estado de la sesión
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
@@ -36,21 +38,14 @@ export default function IndexScreen() {
         );
     }
 
-    // 2. Redirección basada en el estado:
-    if (isAuth) {
-        // Si hay token, enviar a la ruta principal de la aplicación
-        return <Redirect href="/(tabs)" />;
-    } else {
-        // Si NO hay token, forzar al login
-        return <Redirect href="/(auth)/iniciarsesion" />;
-    }
+    return null; 
 }
 
 const styles = StyleSheet.create({
     loadingContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f3ff'
-    }
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f5f3ff",
+    },
 });

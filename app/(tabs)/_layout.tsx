@@ -1,8 +1,31 @@
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
 import { UserProvider } from "../context/UserContext";
+import { checkSession } from "../../services/auth.service";
 
 export default function TabsLayout() {
+  const router = useRouter();
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    async function validateSession() {
+      const hasSession = await checkSession();
+
+      if (!hasSession) {
+        router.replace("/(auth)/iniciarsesion");
+      } else {
+        setChecked(true);
+      }
+    }
+
+    validateSession();
+  }, []);
+
+  if (!checked) {
+    return null;
+  }
+
   return (
     <UserProvider>
       <Tabs
@@ -37,7 +60,7 @@ export default function TabsLayout() {
             ),
           }}
         />
-          <Tabs.Screen
+        <Tabs.Screen
           name="historias"
           options={{
             title: "Historias",
@@ -46,7 +69,6 @@ export default function TabsLayout() {
             ),
           }}
         />
-
         <Tabs.Screen
           name="perfil"
           options={{
@@ -57,27 +79,9 @@ export default function TabsLayout() {
           }}
         />
 
-        <Tabs.Screen
-          name="adminPanel"
-          options={{
-            href: null,
-          }}
-        />
-
-        <Tabs.Screen
-          name="perfilPanel"
-          options={{
-            href: null,
-          }}
-        />
-
-        <Tabs.Screen
-          name="validadorPanel"
-          options={{
-            href: null,
-          }}
-        />
-        
+        <Tabs.Screen name="adminPanel" options={{ href: null }} />
+        <Tabs.Screen name="perfilPanel" options={{ href: null }} />
+        <Tabs.Screen name="validadorPanel" options={{ href: null }} />
       </Tabs>
     </UserProvider>
   );

@@ -51,7 +51,7 @@ export default {
     extra: {
       EXPO_PUBLIC_API_URL: "https://impulsocfa-back.onrender.com/api",
       eas: {
-        projectId: "d1506a12-b77f-456b-9b52-1475a60bdddd"
+        projectId: "393bdcc0-5f5f-4e32-a2a0-2eb02f40788e"
       }
     },
 
